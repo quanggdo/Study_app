@@ -1,0 +1,1 @@
+// Placeholder for flashcards/models/deck_model.dart

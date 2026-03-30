@@ -1,0 +1,1 @@
+// Placeholder for dashboard/views/progress_charts_widget.dart

@@ -1,0 +1,1 @@
+// Placeholder for core/providers/user_provider.dart

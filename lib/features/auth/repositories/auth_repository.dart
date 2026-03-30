@@ -1,0 +1,1 @@
+// Placeholder for auth/repositories/auth_repository.dart

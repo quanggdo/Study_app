@@ -1,0 +1,1 @@
+// Placeholder for academic_schedule/models/class_session_model.dart

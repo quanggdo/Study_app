@@ -1,0 +1,1 @@
+// Placeholder for notes_reminders/models/note_model.dart

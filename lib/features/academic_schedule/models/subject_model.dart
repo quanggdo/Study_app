@@ -1,0 +1,1 @@
+// Placeholder for academic_schedule/models/subject_model.dart

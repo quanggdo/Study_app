@@ -1,0 +1,1 @@
+// Placeholder for quizzes/models/quiz_result_model.dart

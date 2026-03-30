@@ -1,0 +1,1 @@
+// Placeholder for academic_schedule/views/timetable_screen.dart
