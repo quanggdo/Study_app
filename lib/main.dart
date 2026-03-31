@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'core/services/firebase_service.dart';
 
+import 'core/routing/app_router.dart';
+import 'core/services/firebase_service.dart';
 import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Khởi tạo nền tảng Firebase
   await FirebaseService.initialize();
 
@@ -22,17 +23,15 @@ class StudentAcademicAssistantApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return MaterialApp(
+    final router = ref.watch(routerProvider);
+
+    return MaterialApp.router(
       title: 'Student Academic Assistant',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system, // Auto switch based on OS
-      home: const Scaffold(
-        body: Center(
-          child: Text('Student Academic Assistant'),
-        ),
-      ),
+      themeMode: ThemeMode.system,
+      routerConfig: router,
     );
   }
 }

@@ -20,6 +20,26 @@ class Validators {
     return null;
   }
 
+  static String? validateConfirmPassword(String? value, String password) {
+    if (value == null || value.isEmpty) {
+      return 'Vui lòng xác nhận mật khẩu';
+    }
+    if (value != password) {
+      return 'Mật khẩu xác nhận không khớp';
+    }
+    return null;
+  }
+
+  static String? validateDisplayName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Vui lòng nhập họ tên';
+    }
+    if (value.length < 2) {
+      return 'Họ tên phải từ 2 ký tự trở lên';
+    }
+    return null;
+  }
+
   static String? validateEmpty(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập $fieldName';

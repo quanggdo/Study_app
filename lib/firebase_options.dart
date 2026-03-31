@@ -23,20 +23,11 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -65,5 +56,35 @@ class DefaultFirebaseOptions {
     messagingSenderId: '548887080938',
     projectId: 'study-app-2d032',
     storageBucket: 'study-app-2d032.firebasestorage.app',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyD0O8ug9OCvwNTNdbKMKr57eNXOXWnKwgc',
+    appId: '1:548887080938:ios:881991f719905f17ea0c93',
+    messagingSenderId: '548887080938',
+    projectId: 'study-app-2d032',
+    storageBucket: 'study-app-2d032.firebasestorage.app',
+    iosClientId: '548887080938-1j821u5cpnglttbudeh169s7pjelt7sj.apps.googleusercontent.com',
+    iosBundleId: 'com.example.studentAcademicAssistant',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyD0O8ug9OCvwNTNdbKMKr57eNXOXWnKwgc',
+    appId: '1:548887080938:ios:881991f719905f17ea0c93',
+    messagingSenderId: '548887080938',
+    projectId: 'study-app-2d032',
+    storageBucket: 'study-app-2d032.firebasestorage.app',
+    iosClientId: '548887080938-1j821u5cpnglttbudeh169s7pjelt7sj.apps.googleusercontent.com',
+    iosBundleId: 'com.example.studentAcademicAssistant',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyBpOVdUXEWW3u09ShqRLdYkTJonzSjSeAg',
+    appId: '1:548887080938:web:4765203c81f6d2ddea0c93',
+    messagingSenderId: '548887080938',
+    projectId: 'study-app-2d032',
+    authDomain: 'study-app-2d032.firebaseapp.com',
+    storageBucket: 'study-app-2d032.firebasestorage.app',
+    measurementId: 'G-KZCRH1G4NN',
   );
 }
