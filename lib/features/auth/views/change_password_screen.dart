@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/utils/validators.dart';
+import '../../../core/widgets/responsive_center.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import 'widgets/auth_text_field.dart';
 
@@ -84,9 +85,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         ),
         title: const Text('Đổi mật khẩu'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Form(
+      body: ResponsiveCenter(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -99,7 +101,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 height: 80,
                 decoration: BoxDecoration(
                   color: colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
                   Icons.security_rounded,
@@ -152,12 +154,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
               const SizedBox(height: 16),
 
-              // Divider
               Divider(color: colorScheme.outline.withOpacity(0.3)),
 
               const SizedBox(height: 16),
 
-              // New password
               AuthTextField(
                 controller: _newPasswordController,
                 label: 'Mật khẩu mới',
@@ -178,7 +178,6 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
               const SizedBox(height: 16),
 
-              // Confirm new password
               AuthTextField(
                 controller: _confirmPasswordController,
                 label: 'Xác nhận mật khẩu mới',
@@ -223,6 +222,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 ),
               ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.1),
             ],
+          ),
           ),
         ),
       ),

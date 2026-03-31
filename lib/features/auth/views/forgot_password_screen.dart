@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/utils/validators.dart';
+import '../../../core/widgets/responsive_center.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import 'widgets/auth_text_field.dart';
 
@@ -67,9 +68,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         ),
         title: const Text('Quên mật khẩu'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: _emailSent ? _buildSuccessState(colorScheme) : _buildForm(colorScheme, authState),
+      body: ResponsiveCenter(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: _emailSent ? _buildSuccessState(colorScheme) : _buildForm(colorScheme, authState),
+        ),
       ),
     );
   }
@@ -88,7 +91,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             height: 80,
             decoration: BoxDecoration(
               color: colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
               Icons.lock_reset_rounded,

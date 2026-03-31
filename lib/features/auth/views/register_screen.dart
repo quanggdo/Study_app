@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/utils/validators.dart';
+import '../../../core/widgets/responsive_center.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import 'widgets/auth_header.dart';
 import 'widgets/auth_text_field.dart';
@@ -66,8 +67,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     });
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
+      body: ResponsiveCenter(
+        child: SingleChildScrollView(
+          child: Column(
           children: [
             // ── Gradient Header ──
             const AuthHeader(
@@ -78,7 +80,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
             // ── Form ──
             Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(16),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -216,6 +218,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
             ),
           ],
+          ),
         ),
       ),
     );
