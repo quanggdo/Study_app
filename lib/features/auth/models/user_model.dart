@@ -6,7 +6,7 @@ class UserModel {
   final String email;
   final String displayName;
   final String? photoUrl;
-  final int targetStudyTime; // minutes per day
+  final int targetStudyTime; 
   final String? deviceToken;
   final DateTime createdAt;
 

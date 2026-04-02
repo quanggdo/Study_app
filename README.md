@@ -64,8 +64,8 @@ Hệ thống hoạt động theo mô hình: **Input**  **Processing**  **Storage
 
 | Collection | Document ID | Các trường chính (Fields) | Ghi chú |
 | :--- | :--- | :--- | :--- |
-| `quiz` | Auto-ID | `title, category, author, timeLimit, questions[], createdAt` | Chứa đề bài, tuyệt đối **không chứa đáp án đúng** (Security). |
-| `quiz_answers` | `quiz_id` | `correct_answers[]` | Collection riêng tư, chỉ Cloud Function được phép truy cập để chấm điểm. |
+| `quiz` | Auto-ID | `title, category, author, timeLimit, questions[], createdAt, correct_answers[]` | Chứa đề bài, khi lấy đề chỉ lấy câu hỏi, khi chấm bài mới dùng đáp án đúng |
+
 | `flashcards` | Auto-ID | `title, category, author, description, cards[], createdAt` | `cards[]` chứa object `{id, front, back}`. |
 | `users` | `uid` (Auth) | `email, display_name, photo_url, target_study_time, device_token` | `device_token` dùng để gửi Push Notification. |
 | `schedules` | Auto-ID | `u_id, subject_name, day_of_week, start_time, end_time, room, is_from_ocr` | `start/end_time` dùng để tính Dashboard UI. |

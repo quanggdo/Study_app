@@ -10,6 +10,7 @@ import '../../features/auth/views/profile_screen.dart';
 import '../../features/auth/views/register_screen.dart';
 import '../../features/academic_schedule/views/timetable_screen.dart';
 import '../../features/dashboard/views/home_screen.dart';
+import '../../features/notes_reminders/views/notes_reminders_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   // ValueNotifier to trigger GoRouter refresh on auth state change
@@ -52,7 +53,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/forgot-password',
-        builder: (context, state) => const ForgotPasswordScreen(),
+        builder: (context, state) => ForgotPasswordScreen(
+          email: state.uri.queryParameters['email'],
+        ),
       ),
       GoRoute(
         path: '/home',
@@ -69,6 +72,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/timetable',
         builder: (context, state) => const TimetableScreen(),
+      ),
+      GoRoute(
+        path: '/tasks',
+        builder: (context, state) => const NotesRemindersScreen(),
       ),
     ],
   );
