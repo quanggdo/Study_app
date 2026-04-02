@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/routing/app_router.dart';
-import 'core/services/firebase_service.dart';
+import 'core/services/firebase_auth_service.dart';
 import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Khởi tạo nền tảng Firebase
-  await FirebaseService.initialize();
+  // Khởi tạo nền tảng Firebase (thông qua FirebaseAuthService)
+  await FirebaseAuthService.initialize();
 
   runApp(
     const ProviderScope(
