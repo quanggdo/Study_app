@@ -138,6 +138,21 @@ class HomeScreen extends ConsumerWidget {
 
               _buildFeatureCard(
                 context,
+                icon: Icons.event_note_rounded,
+                title: 'Nhắc lịch & Ghi chú',
+                subtitle: 'Quản lý deadline, lên lịch và ghi chép môn học',
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFF1E88E5),
+                    Color(0xFF42A5F5),
+                  ],
+                ),
+                delay: 450,
+                isAvailable: true,
+                onTap: () => context.push('/tasks'),
+              ),
+              _buildFeatureCard(
+                context,
                 icon: Icons.quiz_rounded,
                 title: 'Ôn tập & Flashcard',
                 subtitle: 'Quiz thông minh, luyện tập hiệu quả',
@@ -477,55 +492,73 @@ class HomeScreen extends ConsumerWidget {
             ),
           ],
         ),
-        child: ListTile(
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          leading: Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              gradient: gradient,
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: baseColor.withOpacity(0.35),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: isAvailable ? onTap : null,
+            child: ListTile(
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              leading: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  gradient: gradient,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: baseColor.withOpacity(0.35),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Icon(icon, color: Colors.white, size: 24),
-          ),
-          title: Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5),
-          ),
-          subtitle: Padding(
-            padding: const EdgeInsets.only(top: 3),
-            child: Text(
-              subtitle,
-              style: TextStyle(
-                fontSize: 12.5,
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withOpacity(0.55),
+                child: Icon(icon, color: Colors.white, size: 24),
               ),
-            ),
-          ),
-          trailing: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: baseColor.withOpacity(isDark ? 0.20 : 0.10),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              'Sắp có',
-              style: TextStyle(
-                color: baseColor,
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
+              title: Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5),
               ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 3),
+                child: Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.55),
+                  ),
+                ),
+              ),
+              trailing: isAvailable
+                  ? Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: baseColor.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.arrow_forward_ios_rounded,
+                          color: baseColor, size: 14),
+                    )
+                  : Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: baseColor.withOpacity(isDark ? 0.20 : 0.10),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'Sắp có',
+                        style: TextStyle(
+                          color: baseColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
             ),
           ),
         ),

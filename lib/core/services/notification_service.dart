@@ -1,20 +1,22 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+final notificationServiceProvider = Provider<NotificationService>((ref) {
+  return NotificationService();
+});
+
 class NotificationService {
-  NotificationService._();
+  NotificationService({FlutterLocalNotificationsPlugin? plugin})
+      : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 
-  static final FlutterLocalNotificationsPlugin _plugin =
-      FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _plugin;
+  bool _initialized = false;
 
-  static bool _initialized = false;
-
-  static Future<void> initialize() async {
+  Future<void> initialize() async {
     if (_initialized) return;
 
-    // Local notifications are not fully supported on web by this plugin.
     if (kIsWeb) {
       _initialized = true;
       return;
@@ -30,18 +32,28 @@ class NotificationService {
       ),
     );
 
-    tz.initializeTimeZones();
+    final androidImplementation =
+        _plugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+    await androidImplementation?.requestNotificationsPermission();
+
     _initialized = true;
   }
 
-  static Future<void> scheduleReminder({
+  Future<void> scheduleReminder({
     required int id,
     required String title,
     required String body,
     required DateTime scheduledAt,
     bool alarmStyle = false,
   }) async {
-    if (kIsWeb) return;
+    if (kIsWeb) {
+      throw UnsupportedError(
+        'Local notification is not supported on Web (scheduleReminder).',
+      );
+    }
+
+    await _ensureInitialized();
 
     final scheduledTime = scheduledAt.toLocal();
     if (scheduledTime.isBefore(DateTime.now())) return;
@@ -51,8 +63,8 @@ class NotificationService {
         alarmStyle ? 'study_alarm_channel' : 'study_reminder_channel',
         alarmStyle ? 'Study Alarm' : 'Study Reminder',
         channelDescription: alarmStyle
-            ? 'Thông báo kiểu báo thức cho deadline quan trọng'
-            : 'Nhắc lịch học và deadline',
+            ? 'Thong bao kieu bao thuc cho deadline quan trong'
+            : 'Nhac lich hoc va deadline',
         importance: Importance.max,
         priority: Priority.high,
         fullScreenIntent: alarmStyle,
@@ -64,21 +76,45 @@ class NotificationService {
       ),
     );
 
-    await _plugin.zonedSchedule(
-      id,
-      title,
-      body,
-      tz.TZDateTime.from(scheduledTime, tz.local),
-      details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: null,
-    );
+    try {
+      await _plugin.zonedSchedule(
+        id,
+        title,
+        body,
+        tz.TZDateTime.from(scheduledTime, tz.local),
+        details,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: null,
+      );
+    } catch (e, st) {
+      debugPrint('[NotificationService] scheduleReminder failed: $e');
+      debugPrintStack(stackTrace: st);
+      rethrow;
+    }
   }
 
-  static Future<void> cancelReminder(int id) async {
-    if (kIsWeb) return;
-    await _plugin.cancel(id);
+  Future<void> cancelReminder(int id) async {
+    if (kIsWeb) {
+      throw UnsupportedError(
+        'Local notification is not supported on Web (cancelReminder).',
+      );
+    }
+
+    await _ensureInitialized();
+
+    try {
+      await _plugin.cancel(id);
+    } catch (e, st) {
+      debugPrint('[NotificationService] cancelReminder failed: $e');
+      debugPrintStack(stackTrace: st);
+      rethrow;
+    }
+  }
+
+  Future<void> _ensureInitialized() async {
+    if (_initialized) return;
+    await initialize();
   }
 }
