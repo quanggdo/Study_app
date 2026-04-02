@@ -8,6 +8,7 @@ import '../../features/auth/views/forgot_password_screen.dart';
 import '../../features/auth/views/login_screen.dart';
 import '../../features/auth/views/profile_screen.dart';
 import '../../features/auth/views/register_screen.dart';
+import '../../features/academic_schedule/views/timetable_screen.dart';
 import '../../features/dashboard/views/home_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -64,6 +65,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile',
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/timetable',
+        builder: (context, state) => const TimetableScreen(),
       ),
     ],
   );
