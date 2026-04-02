@@ -104,10 +104,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
     NotesViewModel vm,
   ) async {
     final titleCtrl = TextEditingController();
-    final subjectCtrl = TextEditingController();
-    final descCtrl = TextEditingController();
     DateTime selectedTime = DateTime.now().add(const Duration(minutes: 30));
-    StudyTaskType type = StudyTaskType.deadline;
+    TaskPriority priority = TaskPriority.medium;
 
     await showDialog<void>(
       context: context,
@@ -124,40 +122,31 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
                 children: [
                   TextField(
                     controller: titleCtrl,
-                    decoration: const InputDecoration(labelText: 'Tiêu đề'),
+                    decoration: const InputDecoration(labelText: 'Tên công việc / Môn học'),
                   ),
                   const SizedBox(height: 12),
-                  TextField(
-                    controller: subjectCtrl,
-                    decoration: const InputDecoration(labelText: 'Môn học'),
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<StudyTaskType>(
-                    value: type,
-                    decoration: const InputDecoration(labelText: 'Loại nhắc'),
+                  DropdownButtonFormField<TaskPriority>(
+                    value: priority,
+                    decoration: const InputDecoration(labelText: 'Độ ưu tiên'),
                     items: const [
                       DropdownMenuItem(
-                        value: StudyTaskType.deadline,
-                        child: Text('Deadline'),
+                        value: TaskPriority.high,
+                        child: Text('Khẩn cấp (Báo thức)'),
                       ),
                       DropdownMenuItem(
-                        value: StudyTaskType.schedule,
-                        child: Text('Lịch học'),
+                        value: TaskPriority.medium,
+                        child: Text('Bình thường'),
+                      ),
+                      DropdownMenuItem(
+                        value: TaskPriority.low,
+                        child: Text('Thấp'),
                       ),
                     ],
                     onChanged: (value) {
                       if (value != null) {
-                        setInnerState(() => type = value);
+                        setInnerState(() => priority = value);
                       }
                     },
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: descCtrl,
-                    maxLines: 2,
-                    decoration: const InputDecoration(
-                      labelText: 'Mô tả (tùy chọn)',
-                    ),
                   ),
                   const SizedBox(height: 12),
                   ListTile(
@@ -202,6 +191,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
               ),
               FilledButton(
                 onPressed: () async {
+<<<<<<< Updated upstream
                   if (titleCtrl.text.trim().isEmpty ||
                       subjectCtrl.text.trim().isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -217,14 +207,15 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
                         content: Text('Thời điểm nhắc phải ở tương lai.'),
                       ),
                     );
+=======
+                  if (titleCtrl.text.trim().isEmpty) {
+>>>>>>> Stashed changes
                     return;
                   }
                   await vm.createTask(
                     title: titleCtrl.text,
-                    subject: subjectCtrl.text,
-                    description: descCtrl.text,
                     deadline: selectedTime,
-                    type: type,
+                    priority: priority,
                   );
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -248,7 +239,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
     BuildContext context,
     NotesViewModel vm,
   ) async {
-    final subjectCtrl = TextEditingController();
+    final subjectIdCtrl = TextEditingController();
     final contentCtrl = TextEditingController();
 
     await showDialog<void>(
@@ -264,8 +255,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
-                  controller: subjectCtrl,
-                  decoration: const InputDecoration(labelText: 'Môn học'),
+                  controller: subjectIdCtrl,
+                  decoration: const InputDecoration(labelText: 'Mã môn học'),
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -284,7 +275,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
             ),
             FilledButton(
               onPressed: () async {
-                if (subjectCtrl.text.trim().isEmpty ||
+                if (subjectIdCtrl.text.trim().isEmpty ||
                     contentCtrl.text.trim().isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -295,7 +286,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
                   return;
                 }
                 await vm.createNote(
-                  subject: subjectCtrl.text,
+                  subjectId: subjectIdCtrl.text,
                   content: contentCtrl.text,
                 );
                 if (context.mounted) {
@@ -556,7 +547,7 @@ class _TaskTab extends StatelessWidget {
             onChanged: (_) => onToggle(task),
             title: Text(task.title),
             subtitle: Text(
-              '${task.subject} • ${DateFormat('dd/MM/yyyy HH:mm').format(task.deadline)}\n${task.type == StudyTaskType.deadline ? 'Deadline' : 'Lịch học'}',
+              '${DateFormat('dd/MM/yyyy HH:mm').format(task.deadline)}\nƯu tiên: ${task.priority.name}',
             ),
             secondary: IconButton(
               icon: const Icon(Icons.more_horiz_rounded),
@@ -628,12 +619,17 @@ class _NotesTab extends StatelessWidget {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: ListTile(
+<<<<<<< Updated upstream
             title: Text(note.subject),
             subtitle: Text(
               note.content,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
+=======
+            title: Text(note.subjectId),
+            subtitle: Text(note.content),
+>>>>>>> Stashed changes
             trailing: IconButton(
               icon: const Icon(Icons.more_horiz_rounded),
               onPressed: () {
