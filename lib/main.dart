@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/routing/app_router.dart';
 import 'core/services/firebase_service.dart';
+import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
 
 void main() async {
@@ -10,6 +11,7 @@ void main() async {
 
   // Khởi tạo nền tảng Firebase
   await FirebaseService.initialize();
+  await NotificationService.initialize();
 
   runApp(
     const ProviderScope(
