@@ -9,6 +9,7 @@ import '../../features/auth/views/login_screen.dart';
 import '../../features/auth/views/profile_screen.dart';
 import '../../features/auth/views/register_screen.dart';
 import '../../features/dashboard/views/home_screen.dart';
+import '../../features/notes_reminders/views/notes_reminders_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   // ValueNotifier to trigger GoRouter refresh on auth state change
@@ -66,6 +67,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile',
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/tasks',
+        builder: (context, state) => const NotesRemindersScreen(),
       ),
     ],
   );

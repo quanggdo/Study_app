@@ -282,9 +282,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 }
 
-// =============================================================================
-// Gradient Button (shared with login_screen)
-// =============================================================================
 
 class _GradientButton extends StatelessWidget {
   final VoidCallback? onPressed;
