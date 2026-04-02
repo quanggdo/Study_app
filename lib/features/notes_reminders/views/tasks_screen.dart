@@ -50,6 +50,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
       ),
       body: Column(
         children: [
+          if (state.isLoading) const LinearProgressIndicator(minHeight: 2),
           if (state.errorMessage != null)
             Container(
               width: double.infinity,
@@ -70,10 +71,12 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
                   tasks: state.tasks,
                   onToggle: vm.toggleTask,
                   onDelete: vm.deleteTask,
+                  onEdit: (task) => _showEditTaskDialog(context, vm, task),
                 ),
                 _NotesTab(
                   notes: state.notes,
                   onDelete: vm.deleteNote,
+                  onEdit: (note) => _showEditNoteDialog(context, vm, note),
                 ),
               ],
             ),
@@ -200,6 +203,19 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
                 onPressed: () async {
                   if (titleCtrl.text.trim().isEmpty ||
                       subjectCtrl.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Vui lòng nhập tiêu đề và môn học.'),
+                      ),
+                    );
+                    return;
+                  }
+                  if (selectedTime.isBefore(DateTime.now())) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Thời điểm nhắc phải ở tương lai.'),
+                      ),
+                    );
                     return;
                   }
                   await vm.createTask(
@@ -209,6 +225,13 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
                     deadline: selectedTime,
                     type: type,
                   );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Đã thêm nhắc lịch/deadline.'),
+                      ),
+                    );
+                  }
                   if (mounted) Navigator.pop(ctx);
                 },
                 child: const Text('Lưu'),
@@ -262,15 +285,233 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
               onPressed: () async {
                 if (subjectCtrl.text.trim().isEmpty ||
                     contentCtrl.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content:
+                          Text('Vui lòng nhập môn học và nội dung ghi chú.'),
+                    ),
+                  );
                   return;
                 }
                 await vm.createNote(
                   subject: subjectCtrl.text,
                   content: contentCtrl.text,
                 );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Đã thêm ghi chú môn học.'),
+                    ),
+                  );
+                }
                 if (mounted) Navigator.pop(ctx);
               },
               child: const Text('Lưu'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showEditTaskDialog(
+    BuildContext context,
+    NotesViewModel vm,
+    TaskModel task,
+  ) async {
+    final titleCtrl = TextEditingController(text: task.title);
+    final subjectCtrl = TextEditingController(text: task.subject);
+    final descCtrl = TextEditingController(text: task.description ?? '');
+    DateTime selectedTime = task.deadline;
+    StudyTaskType type = task.type;
+
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setInnerState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: const Text('Chỉnh sửa nhắc lịch / deadline'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: titleCtrl,
+                      decoration: const InputDecoration(labelText: 'Tiêu đề'),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: subjectCtrl,
+                      decoration: const InputDecoration(labelText: 'Môn học'),
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<StudyTaskType>(
+                      value: type,
+                      decoration: const InputDecoration(labelText: 'Loại nhắc'),
+                      items: const [
+                        DropdownMenuItem(
+                          value: StudyTaskType.deadline,
+                          child: Text('Deadline'),
+                        ),
+                        DropdownMenuItem(
+                          value: StudyTaskType.schedule,
+                          child: Text('Lịch học'),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) setInnerState(() => type = value);
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: descCtrl,
+                      maxLines: 2,
+                      decoration: const InputDecoration(
+                        labelText: 'Mô tả (tùy chọn)',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Thời điểm nhắc'),
+                      subtitle: Text(
+                        DateFormat('dd/MM/yyyy HH:mm').format(selectedTime),
+                      ),
+                      trailing: const Icon(Icons.schedule_rounded),
+                      onTap: () async {
+                        final date = await showDatePicker(
+                          context: ctx,
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(2100),
+                          initialDate: selectedTime,
+                        );
+                        if (date == null) return;
+                        final time = await showTimePicker(
+                          context: ctx,
+                          initialTime: TimeOfDay.fromDateTime(selectedTime),
+                        );
+                        if (time == null) return;
+
+                        setInnerState(() {
+                          selectedTime = DateTime(
+                            date.year,
+                            date.month,
+                            date.day,
+                            time.hour,
+                            time.minute,
+                          );
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Hủy'),
+                ),
+                FilledButton(
+                  onPressed: () async {
+                    if (titleCtrl.text.trim().isEmpty ||
+                        subjectCtrl.text.trim().isEmpty) {
+                      return;
+                    }
+                    await vm.updateTask(
+                      task.copyWith(
+                        title: titleCtrl.text.trim(),
+                        subject: subjectCtrl.text.trim(),
+                        description: descCtrl.text.trim().isEmpty
+                            ? null
+                            : descCtrl.text.trim(),
+                        deadline: selectedTime,
+                        type: type,
+                      ),
+                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Đã cập nhật nhắc lịch/deadline.'),
+                        ),
+                      );
+                    }
+                    if (context.mounted) Navigator.pop(ctx);
+                  },
+                  child: const Text('Cập nhật'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _showEditNoteDialog(
+    BuildContext context,
+    NotesViewModel vm,
+    NoteModel note,
+  ) async {
+    final subjectCtrl = TextEditingController(text: note.subject);
+    final contentCtrl = TextEditingController(text: note.content);
+
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text('Chỉnh sửa ghi chú môn học'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: subjectCtrl,
+                  decoration: const InputDecoration(labelText: 'Môn học'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: contentCtrl,
+                  maxLines: 5,
+                  decoration:
+                      const InputDecoration(labelText: 'Nội dung ghi chú'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Hủy'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                if (subjectCtrl.text.trim().isEmpty ||
+                    contentCtrl.text.trim().isEmpty) {
+                  return;
+                }
+                await vm.updateNote(
+                  note.copyWith(
+                    subject: subjectCtrl.text.trim(),
+                    content: contentCtrl.text.trim(),
+                  ),
+                );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Đã cập nhật ghi chú.'),
+                    ),
+                  );
+                }
+                if (context.mounted) Navigator.pop(ctx);
+              },
+              child: const Text('Cập nhật'),
             ),
           ],
         );
@@ -283,11 +524,13 @@ class _TaskTab extends StatelessWidget {
   final List<TaskModel> tasks;
   final Future<void> Function(TaskModel task) onToggle;
   final Future<void> Function(TaskModel task) onDelete;
+  final Future<void> Function(TaskModel task) onEdit;
 
   const _TaskTab({
     required this.tasks,
     required this.onToggle,
     required this.onDelete,
+    required this.onEdit,
   });
 
   @override
@@ -315,8 +558,37 @@ class _TaskTab extends StatelessWidget {
               '${task.subject} • ${DateFormat('dd/MM/yyyy HH:mm').format(task.deadline)}\n${task.type == StudyTaskType.deadline ? 'Deadline' : 'Lịch học'}',
             ),
             secondary: IconButton(
-              icon: const Icon(Icons.delete_outline_rounded),
-              onPressed: () => onDelete(task),
+              icon: const Icon(Icons.more_horiz_rounded),
+              onPressed: () {
+                showModalBottomSheet<void>(
+                  context: context,
+                  builder: (sheetContext) {
+                    return SafeArea(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                            leading: const Icon(Icons.edit_rounded),
+                            title: const Text('Chỉnh sửa'),
+                            onTap: () {
+                              Navigator.pop(sheetContext);
+                              onEdit(task);
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.delete_outline_rounded),
+                            title: const Text('Xóa'),
+                            onTap: () {
+                              Navigator.pop(sheetContext);
+                              onDelete(task);
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
             ),
             controlAffinity: ListTileControlAffinity.leading,
           ),
@@ -329,10 +601,12 @@ class _TaskTab extends StatelessWidget {
 class _NotesTab extends StatelessWidget {
   final List<NoteModel> notes;
   final Future<void> Function(String noteId) onDelete;
+  final Future<void> Function(NoteModel note) onEdit;
 
   const _NotesTab({
     required this.notes,
     required this.onDelete,
+    required this.onEdit,
   });
 
   @override
@@ -354,10 +628,43 @@ class _NotesTab extends StatelessWidget {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: ListTile(
             title: Text(note.subject),
-            subtitle: Text(note.content),
+            subtitle: Text(
+              note.content,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
             trailing: IconButton(
-              icon: const Icon(Icons.delete_outline_rounded),
-              onPressed: () => onDelete(note.id),
+              icon: const Icon(Icons.more_horiz_rounded),
+              onPressed: () {
+                showModalBottomSheet<void>(
+                  context: context,
+                  builder: (sheetContext) {
+                    return SafeArea(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                            leading: const Icon(Icons.edit_rounded),
+                            title: const Text('Chỉnh sửa'),
+                            onTap: () {
+                              Navigator.pop(sheetContext);
+                              onEdit(note);
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.delete_outline_rounded),
+                            title: const Text('Xóa'),
+                            onTap: () {
+                              Navigator.pop(sheetContext);
+                              onDelete(note.id);
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ),
         );

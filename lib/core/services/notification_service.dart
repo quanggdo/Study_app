@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -12,6 +13,12 @@ class NotificationService {
 
   static Future<void> initialize() async {
     if (_initialized) return;
+
+    // Local notifications are not fully supported on web by this plugin.
+    if (kIsWeb) {
+      _initialized = true;
+      return;
+    }
 
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     const ios = DarwinInitializationSettings();
@@ -34,6 +41,8 @@ class NotificationService {
     required DateTime scheduledAt,
     bool alarmStyle = false,
   }) async {
+    if (kIsWeb) return;
+
     final scheduledTime = scheduledAt.toLocal();
     if (scheduledTime.isBefore(DateTime.now())) return;
 
@@ -69,6 +78,7 @@ class NotificationService {
   }
 
   static Future<void> cancelReminder(int id) async {
+    if (kIsWeb) return;
     await _plugin.cancel(id);
   }
 }

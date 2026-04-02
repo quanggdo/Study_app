@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,6 +39,8 @@ class NotesRemindersState {
 class NotesViewModel extends StateNotifier<NotesRemindersState> {
   final Ref _ref;
   final NotesRepository _repository;
+  StreamSubscription<List<TaskModel>>? _tasksSub;
+  StreamSubscription<List<NoteModel>>? _notesSub;
 
   NotesViewModel(this._ref, this._repository)
       : super(const NotesRemindersState()) {
@@ -48,11 +51,14 @@ class NotesViewModel extends StateNotifier<NotesRemindersState> {
     final user = _ref.read(currentUserProvider);
     if (user == null) return;
 
-    _repository.watchTasks(user.uid).listen((tasks) {
+    _tasksSub?.cancel();
+    _notesSub?.cancel();
+
+    _tasksSub = _repository.watchTasks(user.uid).listen((tasks) {
       state = state.copyWith(tasks: tasks);
     });
 
-    _repository.watchNotes(user.uid).listen((notes) {
+    _notesSub = _repository.watchNotes(user.uid).listen((notes) {
       state = state.copyWith(notes: notes);
     });
   }
@@ -112,6 +118,19 @@ class NotesViewModel extends StateNotifier<NotesRemindersState> {
     }
   }
 
+  Future<void> updateTask(TaskModel task) async {
+    try {
+      state = state.copyWith(isLoading: true, errorMessage: null);
+      await _repository.updateTask(task);
+      state = state.copyWith(isLoading: false);
+    } catch (_) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Không thể cập nhật nhắc lịch/deadline.',
+      );
+    }
+  }
+
   Future<void> createNote({
     required String subject,
     required String content,
@@ -148,6 +167,32 @@ class NotesViewModel extends StateNotifier<NotesRemindersState> {
     } catch (_) {
       state = state.copyWith(errorMessage: 'Không thể xóa ghi chú.');
     }
+  }
+
+  Future<void> updateNote(NoteModel note) async {
+    try {
+      state = state.copyWith(isLoading: true, errorMessage: null);
+      await _repository.updateNote(
+        note.copyWith(updatedAt: DateTime.now()),
+      );
+      state = state.copyWith(isLoading: false);
+    } catch (_) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Không thể cập nhật ghi chú.',
+      );
+    }
+  }
+
+  void clearError() {
+    state = state.copyWith(errorMessage: null);
+  }
+
+  @override
+  void dispose() {
+    _tasksSub?.cancel();
+    _notesSub?.cancel();
+    super.dispose();
   }
 
   int _generateReminderId(DateTime date) {
