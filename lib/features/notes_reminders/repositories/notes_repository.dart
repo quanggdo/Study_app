@@ -46,12 +46,12 @@ class NotesRepository {
 
     await NotificationService.scheduleReminder(
       id: task.reminderId,
-      title: task.type == StudyTaskType.schedule
-          ? 'Nhắc lịch học: ${task.subject}'
-          : 'Deadline: ${task.subject}',
-      body: task.title,
+      title: task.priority == TaskPriority.high
+          ? 'Nhắc khẩn cấp: ${task.title}'
+          : 'Deadline: ${task.title}',
+      body: 'Đến giờ rồi, tập trung làm việc bạn nhé!',
       scheduledAt: task.deadline,
-      alarmStyle: task.type == StudyTaskType.deadline,
+      alarmStyle: task.priority == TaskPriority.high,
     );
   }
 

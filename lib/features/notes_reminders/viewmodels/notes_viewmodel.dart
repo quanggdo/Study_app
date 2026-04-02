@@ -65,10 +65,8 @@ class NotesViewModel extends StateNotifier<NotesRemindersState> {
 
   Future<void> createTask({
     required String title,
-    required String subject,
-    String? description,
     required DateTime deadline,
-    required StudyTaskType type,
+    required TaskPriority priority,
   }) async {
     final user = _ref.read(currentUserProvider);
     if (user == null) return;
@@ -80,13 +78,10 @@ class NotesViewModel extends StateNotifier<NotesRemindersState> {
         id: '',
         uId: user.uid,
         title: title.trim(),
-        subject: subject.trim(),
-        description:
-            description?.trim().isEmpty == true ? null : description?.trim(),
         deadline: deadline,
         isCompleted: false,
         reminderId: _generateReminderId(deadline),
-        type: type,
+        priority: priority,
         createdAt: DateTime.now(),
       );
 
@@ -132,7 +127,7 @@ class NotesViewModel extends StateNotifier<NotesRemindersState> {
   }
 
   Future<void> createNote({
-    required String subject,
+    required String subjectId,
     required String content,
   }) async {
     final user = _ref.read(currentUserProvider);
@@ -145,7 +140,7 @@ class NotesViewModel extends StateNotifier<NotesRemindersState> {
       final note = NoteModel(
         id: '',
         uId: user.uid,
-        subject: subject.trim(),
+        subjectId: subjectId.trim(),
         content: content.trim(),
         createdAt: now,
         updatedAt: now,

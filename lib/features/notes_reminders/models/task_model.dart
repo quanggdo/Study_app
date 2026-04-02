@@ -1,47 +1,51 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum StudyTaskType { schedule, deadline }
+enum TaskPriority { high, medium, low }
 
 class TaskModel {
   final String id;
   final String uId;
   final String title;
-  final String subject;
-  final String? description;
   final DateTime deadline;
   final bool isCompleted;
   final int reminderId;
-  final StudyTaskType type;
+  final TaskPriority priority;
   final DateTime createdAt;
 
   const TaskModel({
     required this.id,
     required this.uId,
     required this.title,
-    required this.subject,
-    this.description,
     required this.deadline,
-    required this.isCompleted,
+    this.isCompleted = false,
     required this.reminderId,
-    required this.type,
+    this.priority = TaskPriority.medium,
     required this.createdAt,
   });
 
   factory TaskModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
 
+    TaskPriority parsePriority(String? p) {
+      switch (p) {
+        case 'high':
+          return TaskPriority.high;
+        case 'low':
+          return TaskPriority.low;
+        case 'medium':
+        default:
+          return TaskPriority.medium;
+      }
+    }
+
     return TaskModel(
       id: doc.id,
       uId: data['u_id'] ?? '',
       title: data['title'] ?? '',
-      subject: data['subject'] ?? '',
-      description: data['description'],
       deadline: (data['deadline'] as Timestamp?)?.toDate() ?? DateTime.now(),
       isCompleted: data['is_completed'] ?? false,
       reminderId: data['reminder_id'] ?? 0,
-      type: (data['type'] ?? 'deadline') == 'schedule'
-          ? StudyTaskType.schedule
-          : StudyTaskType.deadline,
+      priority: parsePriority(data['priority'] as String?),
       createdAt: (data['created_at'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
@@ -50,12 +54,10 @@ class TaskModel {
     return {
       'u_id': uId,
       'title': title,
-      'subject': subject,
-      'description': description,
       'deadline': Timestamp.fromDate(deadline),
       'is_completed': isCompleted,
       'reminder_id': reminderId,
-      'type': type == StudyTaskType.schedule ? 'schedule' : 'deadline',
+      'priority': priority.name,
       'created_at': Timestamp.fromDate(createdAt),
     };
   }
@@ -64,24 +66,20 @@ class TaskModel {
     String? id,
     String? uId,
     String? title,
-    String? subject,
-    String? description,
     DateTime? deadline,
     bool? isCompleted,
     int? reminderId,
-    StudyTaskType? type,
+    TaskPriority? priority,
     DateTime? createdAt,
   }) {
     return TaskModel(
       id: id ?? this.id,
       uId: uId ?? this.uId,
       title: title ?? this.title,
-      subject: subject ?? this.subject,
-      description: description ?? this.description,
       deadline: deadline ?? this.deadline,
       isCompleted: isCompleted ?? this.isCompleted,
       reminderId: reminderId ?? this.reminderId,
-      type: type ?? this.type,
+      priority: priority ?? this.priority,
       createdAt: createdAt ?? this.createdAt,
     );
   }
