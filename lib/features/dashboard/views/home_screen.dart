@@ -37,8 +37,8 @@ class HomeScreen extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                    color: Colors.white.withOpacity(0.25), width: 1),
+                border:
+                    Border.all(color: Colors.white.withOpacity(0.25), width: 1),
               ),
               child: const Icon(Icons.school_rounded,
                   color: Colors.white, size: 18),
@@ -117,8 +117,8 @@ class HomeScreen extends ConsumerWidget {
                         ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: colorScheme.primaryContainer,
                       borderRadius: BorderRadius.circular(20),
@@ -176,6 +176,8 @@ class HomeScreen extends ConsumerWidget {
                   ],
                 ),
                 delay: 530,
+                isAvailable: true,
+                onTap: () => context.push('/timetable'),
               ),
               _buildFeatureCard(
                 context,
@@ -285,19 +287,19 @@ class HomeScreen extends ConsumerWidget {
                             color: Colors.white.withOpacity(0.35), width: 2),
                       ),
                       clipBehavior: Clip.antiAlias,
-                      child: user?.photoUrl != null &&
-                              user!.photoUrl!.isNotEmpty
-                          ? Image.network(
-                              user.photoUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Icon(
-                                Icons.person_rounded,
-                                color: Colors.white,
-                                size: 28,
-                              ),
-                            )
-                          : const Icon(Icons.person_rounded,
-                              color: Colors.white, size: 28),
+                      child:
+                          user?.photoUrl != null && user!.photoUrl!.isNotEmpty
+                              ? Image.network(
+                                  user.photoUrl!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => const Icon(
+                                    Icons.person_rounded,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                )
+                              : const Icon(Icons.person_rounded,
+                                  color: Colors.white, size: 28),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -328,8 +330,8 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   // Badge
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(20),
@@ -409,9 +411,11 @@ class HomeScreen extends ConsumerWidget {
       children: stats.asMap().entries.map((entry) {
         final stat = entry.value;
         final delay = 350 + entry.key * 80;
+
         return Expanded(
           child: Padding(
-            padding: EdgeInsets.only(right: entry.key < stats.length - 1 ? 10 : 0),
+            padding:
+                EdgeInsets.only(right: entry.key < stats.length - 1 ? 10 : 0),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
               decoration: BoxDecoration(
@@ -456,9 +460,9 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-            ).animate().fadeIn(delay: Duration(milliseconds: delay)).slideY(begin: 0.06),
+            ),
           ),
-        );
+        ).animate().fadeIn(delay: Duration(milliseconds: delay));
       }).toList(),
     );
   }
@@ -518,7 +522,8 @@ class HomeScreen extends ConsumerWidget {
               ),
               title: Text(
                 title,
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5),
+                style: const TextStyle(
+                    fontWeight: FontWeight.w700, fontSize: 14.5),
               ),
               subtitle: Padding(
                 padding: const EdgeInsets.only(top: 3),
@@ -540,12 +545,17 @@ class HomeScreen extends ConsumerWidget {
                         color: baseColor.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.arrow_forward_ios_rounded,
-                          color: baseColor, size: 14),
+                      child: Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: baseColor,
+                        size: 14,
+                      ),
                     )
                   : Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
                         color: baseColor.withOpacity(isDark ? 0.20 : 0.10),
                         borderRadius: BorderRadius.circular(20),
@@ -563,7 +573,10 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
       ),
-    ).animate().fadeIn(delay: Duration(milliseconds: delay)).slideX(begin: 0.04);
+    )
+        .animate()
+        .fadeIn(delay: Duration(milliseconds: delay))
+        .slideX(begin: 0.04);
   }
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {
@@ -585,8 +598,7 @@ class HomeScreen extends ConsumerWidget {
             style: OutlinedButton.styleFrom(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
             child: const Text('Hủy'),
           ),
@@ -600,8 +612,7 @@ class HomeScreen extends ConsumerWidget {
               backgroundColor: Colors.red.shade600,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
             child: const Text('Đăng xuất'),
           ),
@@ -651,8 +662,7 @@ class _AppBarButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.12),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-                color: Colors.white.withOpacity(0.20), width: 1),
+            border: Border.all(color: Colors.white.withOpacity(0.20), width: 1),
           ),
           child: Icon(icon, color: Colors.white, size: 18),
         ),
