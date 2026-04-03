@@ -21,7 +21,7 @@ void main() async {
       overrides: [
         notificationServiceProvider.overrideWithValue(notificationService),
       ],
-      child: StudentAcademicAssistantApp(),
+      child: const StudentAcademicAssistantApp(),
     ),
   );
 }

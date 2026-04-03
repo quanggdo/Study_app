@@ -37,8 +37,8 @@ class HomeScreen extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(8),
-                border:
-                    Border.all(color: Colors.white.withOpacity(0.25), width: 1),
+                border: Border.all(
+                    color: Colors.white.withOpacity(0.25), width: 1),
               ),
               child: const Icon(Icons.school_rounded,
                   color: Colors.white, size: 18),
@@ -73,6 +73,17 @@ class HomeScreen extends ConsumerWidget {
             icon: Icons.logout_rounded,
             tooltip: 'Đăng xuất',
             onPressed: () => _showLogoutDialog(context, ref),
+          ),
+          // Debug: quick access to Pomodoro
+          IconButton(
+            tooltip: 'Pomodoro (debug)',
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Navigate to Pomodoro (debug)')),
+              );
+              context.push('/pomodoro');
+            },
+            icon: const Icon(Icons.timer_rounded, size: 18, color: Colors.white),
           ),
           const SizedBox(width: 8),
         ],
@@ -117,8 +128,8 @@ class HomeScreen extends ConsumerWidget {
                         ),
                   ),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: colorScheme.primaryContainer,
                       borderRadius: BorderRadius.circular(20),
@@ -156,10 +167,10 @@ class HomeScreen extends ConsumerWidget {
                 icon: Icons.quiz_rounded,
                 title: 'Ôn tập & Flashcard',
                 subtitle: 'Quiz thông minh, luyện tập hiệu quả',
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [
-                    const Color(0xFF3949AB),
-                    const Color(0xFF5C6BC0),
+                    Color(0xFF3949AB),
+                    Color(0xFF5C6BC0),
                   ],
                 ),
                 delay: 450,
@@ -169,10 +180,10 @@ class HomeScreen extends ConsumerWidget {
                 icon: Icons.calendar_month_rounded,
                 title: 'Thời khóa biểu (OCR)',
                 subtitle: 'Quét lịch học bằng camera nhanh chóng',
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [
-                    const Color(0xFF00897B),
-                    const Color(0xFF4DB6AC),
+                    Color(0xFF00897B),
+                    Color(0xFF4DB6AC),
                   ],
                 ),
                 delay: 530,
@@ -184,36 +195,83 @@ class HomeScreen extends ConsumerWidget {
                 icon: Icons.mic_rounded,
                 title: 'Ghi chú thông minh',
                 subtitle: 'Ghi chú bằng giọng nói (ASR)',
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [
-                    const Color(0xFF7B1FA2),
-                    const Color(0xFFAB47BC),
+                    Color(0xFF7B1FA2),
+                    Color(0xFFAB47BC),
                   ],
                 ),
                 delay: 610,
               ),
-              _buildFeatureCard(
-                context,
-                icon: Icons.timer_rounded,
-                title: 'Pomodoro Timer',
-                subtitle: 'Tập trung sâu & Deep Work Mode',
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFFE53935),
-                    const Color(0xFFEF5350),
-                  ],
+              // Temporary explicit card to ensure tap/navigation works
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1C1F2E) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark
+                            ? Colors.black.withOpacity(0.20)
+                            : const Color(0xFFE53935).withOpacity(0.08),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () => context.push('/pomodoro'),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        leading: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFE53935), Color(0xFFEF5350)],
+                            ),
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFE53935).withOpacity(0.35),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(Icons.timer_rounded, color: Colors.white, size: 24),
+                        ),
+                        title: const Text('Pomodoro Timer', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5)),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 3),
+                          child: Text('Tập trung sâu & Deep Work Mode', style: TextStyle(fontSize: 12.5, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.55))),
+                        ),
+                        trailing: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE53935).withOpacity(isDark ? 0.20 : 0.10),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFFE53935), size: 14),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                delay: 690,
               ),
               _buildFeatureCard(
                 context,
                 icon: Icons.bar_chart_rounded,
                 title: 'Thống kê & Báo cáo',
                 subtitle: 'Biểu đồ tiến độ học tập theo thời gian',
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [
-                    const Color(0xFFF57C00),
-                    const Color(0xFFFFB74D),
+                    Color(0xFFF57C00),
+                    Color(0xFFFFB74D),
                   ],
                 ),
                 delay: 770,
@@ -287,19 +345,19 @@ class HomeScreen extends ConsumerWidget {
                             color: Colors.white.withOpacity(0.35), width: 2),
                       ),
                       clipBehavior: Clip.antiAlias,
-                      child:
-                          user?.photoUrl != null && user!.photoUrl!.isNotEmpty
-                              ? Image.network(
-                                  user.photoUrl!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => const Icon(
-                                    Icons.person_rounded,
-                                    color: Colors.white,
-                                    size: 28,
-                                  ),
-                                )
-                              : const Icon(Icons.person_rounded,
-                                  color: Colors.white, size: 28),
+                      child: user?.photoUrl != null &&
+                              user!.photoUrl!.isNotEmpty
+                          ? Image.network(
+                              user.photoUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                Icons.person_rounded,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                            )
+                          : const Icon(Icons.person_rounded,
+                              color: Colors.white, size: 28),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -330,8 +388,8 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   // Badge
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(20),
@@ -390,17 +448,17 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildQuickStats(
       BuildContext context, ColorScheme colorScheme, bool isDark) {
     final stats = [
-      _StatItem(
+      const _StatItem(
           icon: Icons.local_fire_department_rounded,
           label: 'Streak',
           value: '0 ngày',
           color: Colors.orange),
-      _StatItem(
+      const _StatItem(
           icon: Icons.timer_rounded,
           label: 'Đã học',
           value: '0 phút',
-          color: const Color(0xFF3949AB)),
-      _StatItem(
+          color: Color(0xFF3949AB)),
+      const _StatItem(
           icon: Icons.task_alt_rounded,
           label: 'Task',
           value: '0/0',
@@ -411,11 +469,9 @@ class HomeScreen extends ConsumerWidget {
       children: stats.asMap().entries.map((entry) {
         final stat = entry.value;
         final delay = 350 + entry.key * 80;
-
         return Expanded(
           child: Padding(
-            padding:
-                EdgeInsets.only(right: entry.key < stats.length - 1 ? 10 : 0),
+            padding: EdgeInsets.only(right: entry.key < stats.length - 1 ? 10 : 0),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
               decoration: BoxDecoration(
@@ -460,9 +516,9 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-            ),
+            ).animate().fadeIn(delay: Duration(milliseconds: delay)).slideY(begin: 0.06),
           ),
-        ).animate().fadeIn(delay: Duration(milliseconds: delay));
+        );
       }).toList(),
     );
   }
@@ -522,8 +578,7 @@ class HomeScreen extends ConsumerWidget {
               ),
               title: Text(
                 title,
-                style: const TextStyle(
-                    fontWeight: FontWeight.w700, fontSize: 14.5),
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5),
               ),
               subtitle: Padding(
                 padding: const EdgeInsets.only(top: 3),
@@ -545,17 +600,12 @@ class HomeScreen extends ConsumerWidget {
                         color: baseColor.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: baseColor,
-                        size: 14,
-                      ),
+                      child: Icon(Icons.arrow_forward_ios_rounded,
+                          color: baseColor, size: 14),
                     )
                   : Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
+                          horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: baseColor.withOpacity(isDark ? 0.20 : 0.10),
                         borderRadius: BorderRadius.circular(20),
@@ -573,10 +623,7 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
       ),
-    )
-        .animate()
-        .fadeIn(delay: Duration(milliseconds: delay))
-        .slideX(begin: 0.04);
+    ).animate().fadeIn(delay: Duration(milliseconds: delay)).slideX(begin: 0.04);
   }
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {
@@ -598,7 +645,8 @@ class HomeScreen extends ConsumerWidget {
             style: OutlinedButton.styleFrom(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
             child: const Text('Hủy'),
           ),
@@ -612,7 +660,8 @@ class HomeScreen extends ConsumerWidget {
               backgroundColor: Colors.red.shade600,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
             child: const Text('Đăng xuất'),
           ),
@@ -662,7 +711,8 @@ class _AppBarButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.12),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.white.withOpacity(0.20), width: 1),
+            border: Border.all(
+                color: Colors.white.withOpacity(0.20), width: 1),
           ),
           child: Icon(icon, color: Colors.white, size: 18),
         ),

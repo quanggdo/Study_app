@@ -11,6 +11,7 @@ import '../../features/auth/views/register_screen.dart';
 import '../../features/academic_schedule/views/timetable_screen.dart';
 import '../../features/dashboard/views/home_screen.dart';
 import '../../features/notes_reminders/views/notes_reminders_screen.dart';
+import '../../features/pomodoro/views/pomodoro_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   // ValueNotifier to trigger GoRouter refresh on auth state change
@@ -72,6 +73,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/timetable',
         builder: (context, state) => const TimetableScreen(),
+      ),
+      GoRoute(
+        path: '/pomodoro',
+        builder: (context, state) => const PomodoroScreen(),
       ),
       GoRoute(
         path: '/tasks',
