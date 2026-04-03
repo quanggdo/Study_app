@@ -15,7 +15,7 @@ extension ReviewGradeX on ReviewGrade {
   int get quality {
     switch (this) {
       case ReviewGrade.again:
-        return 0;
+        return 1;
       case ReviewGrade.hard:
         return 3;
       case ReviewGrade.good:
@@ -170,6 +170,29 @@ class ReviewSessionViewModel extends StateNotifier<ReviewSessionState> {
       index: newIndex,
       showAnswer: false,
       lastScheduledMessage: _formatScheduleMessage(now: now, next: next, grade: grade),
+    );
+  }
+
+  /// Dự đoán lịch hẹn cho từng grade để hiển thị trên UI (Anki-like) trước khi bấm.
+  /// Lưu ý: với thẻ chưa có state, dùng state mặc định từ repo.
+  Future<ReviewState?> previewNextState(ReviewGrade grade) async {
+    final current = state.current;
+    if (current == null) return null;
+
+    final now = DateTime.now();
+
+    final prev = current.state ??
+        await repo.getOrCreateReviewState(
+          uId: uId,
+          deckId: deckId,
+          cardId: current.card.id,
+          now: now,
+        );
+
+    return Sm2.grade(
+      previous: prev,
+      quality: grade.quality,
+      now: now,
     );
   }
 }

@@ -15,8 +15,15 @@ import '../models/review_state.dart';
 class Sm2 {
   static const double _minEaseFactor = 1.3;
 
-  // Learning steps (phút) kiểu Anki, tối giản.
+  // Learning steps (phút) kiểu Anki (mặc định phổ biến là 1m -> 10m).
+  // Again: quay về 1m
+  // Good: tiến step tiếp theo
+  // Easy: graduate sớm (ra review)
   static const List<int> _learningStepsMinutes = [1, 10];
+
+  // Hard trong learning: Anki thường cho thời gian ngắn hơn Good của step hiện tại.
+  // Với step=10m thì Hard ~ 6m (0.6x) giúp khác biệt rõ với Again(1m) và Good(10m).
+  static const double _hardLearningMultiplier = 0.6;
 
   static ReviewState grade({
     required ReviewState previous,
@@ -39,6 +46,8 @@ class Sm2 {
     required int q,
     required DateTime now,
   }) {
+    final isNew = previous.reps == 0 && previous.intervalMinutes == 0;
+
     // Again: quay về step 1
     if (q < 3) {
       return previous.copyWith(
@@ -53,25 +62,62 @@ class Sm2 {
       );
     }
 
-    // Hard: giữ nguyên step hiện tại (hoặc step 1 nếu đang 0)
+    // Hard: Anki-ish => lặp lại sớm hơn Good (không quay về 1m như Again).
     if (q == 3) {
-      final step = previous.intervalMinutes > 0 ? previous.intervalMinutes : _learningStepsMinutes.first;
+      // Với thẻ mới (chưa có interval), Anki preview: Hard=6m, Good=10m.
+      // => coi như current step mục tiêu là 10m để tính Hard.
+      final stepForHard = isNew ? _learningStepsMinutes.last : previous.intervalMinutes;
+
+      final currentStep = stepForHard > 0 ? stepForHard : _learningStepsMinutes.first;
+
+      // Nếu đang ở step 1m thì Hard vẫn là 1m.
+      // Nếu đang ở step 10m thì Hard ~ 6m.
+      final hardMinutes = currentStep <= _learningStepsMinutes.first
+          ? _learningStepsMinutes.first
+          : (currentStep * _hardLearningMultiplier).round().clamp(
+                _learningStepsMinutes.first,
+                currentStep,
+              );
+
       final reps = previous.reps + 1;
       return previous.copyWith(
         stateType: ReviewStateType.learning,
         reps: reps,
         intervalDays: 0,
-        intervalMinutes: step,
+        intervalMinutes: hardMinutes,
         lastReviewedAt: now,
         updatedAt: now,
-        dueAt: now.add(Duration(minutes: step)),
+        dueAt: now.add(Duration(minutes: hardMinutes)),
+      );
+    }
+
+    // Easy: Anki thường graduate sớm ngay từ bước đầu.
+    if (q == 5 && isNew) {
+      const firstIntervalDays = 4;
+      return previous.copyWith(
+        stateType: ReviewStateType.review,
+        reps: previous.reps + 1,
+        intervalMinutes: 0,
+        intervalDays: firstIntervalDays,
+        easeFactor: (previous.easeFactor + 0.15).clamp(_minEaseFactor, 10.0),
+        lastReviewedAt: now,
+        updatedAt: now,
+        dueAt: now.add(const Duration(days: firstIntervalDays)),
       );
     }
 
     // Good/Easy: tiến step
-    final currentStep = previous.intervalMinutes;
+    // Nếu state mới (intervalMinutes=0), coi như Good sẽ nhảy thẳng lên step tiếp theo (10m)
+    // thay vì rơi vào step đầu (1m), để khớp UI Anki: Good 10m ở lần học đầu.
+    final currentStep = previous.intervalMinutes > 0
+        ? previous.intervalMinutes
+        : (isNew ? _learningStepsMinutes.first : _learningStepsMinutes.first);
+
     final idx = _learningStepsMinutes.indexOf(currentStep);
-    final nextIdx = idx >= 0 ? idx + 1 : 0;
+
+    final nextIdx = previous.intervalMinutes == 0 && isNew
+        ? 1
+        : (idx >= 0 ? idx + 1 : 0);
 
     // Nếu hết steps => chuyển sang review
     if (nextIdx >= _learningStepsMinutes.length) {
@@ -82,8 +128,9 @@ class Sm2 {
         reps: previous.reps + 1,
         intervalMinutes: 0,
         intervalDays: firstIntervalDays,
-        // Cập nhật EF nhẹ khi Easy
-        easeFactor: q == 5 ? (previous.easeFactor + 0.15).clamp(_minEaseFactor, 10.0) : previous.easeFactor,
+        easeFactor: q == 5
+            ? (previous.easeFactor + 0.15).clamp(_minEaseFactor, 10.0)
+            : previous.easeFactor,
         lastReviewedAt: now,
         updatedAt: now,
         dueAt: now.add(Duration(days: firstIntervalDays)),
