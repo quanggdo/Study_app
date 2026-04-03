@@ -51,6 +51,15 @@ class TimetableScreen extends ConsumerWidget {
                   _DaySection(
                     dayOfWeek: day,
                     sessions: grouped[day]!,
+                    onEdit: (ClassSessionModel session) {
+                      _showEditSessionDialog(
+                        context,
+                        ref,
+                        uid ?? '',
+                        session,
+                        sessions,
+                      );
+                    },
                     onDelete: (String id) {
                       ref.read(scheduleNotifierProvider.notifier).deleteSession(
                             id,
@@ -88,7 +97,23 @@ class TimetableScreen extends ConsumerWidget {
           : FloatingActionButton.extended(
               onPressed: state.isImporting || state.isSubmitting
                   ? null
-                  : () => _showCreateOptions(context, ref, uid),
+                  : () {
+                      final AsyncValue<List<ClassSessionModel>>
+                          currentSchedule =
+                          ref.read(userScheduleStreamProvider);
+                      final List<ClassSessionModel> existingSessions =
+                          currentSchedule.maybeWhen(
+                        data: (List<ClassSessionModel> sessions) => sessions,
+                        orElse: () => <ClassSessionModel>[],
+                      );
+
+                      _showCreateOptions(
+                        context,
+                        ref,
+                        uid,
+                        existingSessions,
+                      );
+                    },
               icon: state.isImporting || state.isSubmitting
                   ? const SizedBox(
                       width: 20,
@@ -103,7 +128,12 @@ class TimetableScreen extends ConsumerWidget {
     );
   }
 
-  void _showCreateOptions(BuildContext context, WidgetRef ref, String uid) {
+  void _showCreateOptions(
+    BuildContext context,
+    WidgetRef ref,
+    String uid,
+    List<ClassSessionModel> existingSessions,
+  ) {
     showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -122,7 +152,12 @@ class TimetableScreen extends ConsumerWidget {
                   subtitle: const Text('Tạo buổi học thủ công'),
                   onTap: () {
                     Navigator.pop(ctx);
-                    _showManualCreateDialog(context, ref, uid);
+                    _showManualCreateDialog(
+                      context,
+                      ref,
+                      uid,
+                      existingSessions,
+                    );
                   },
                 ),
                 ListTile(
@@ -131,9 +166,27 @@ class TimetableScreen extends ConsumerWidget {
                   subtitle: const Text('Dùng Gemini 2.5 Flash để trích xuất'),
                   onTap: () async {
                     Navigator.pop(ctx);
+
+                    bool replaceExisting = false;
+                    if (existingSessions.isNotEmpty) {
+                      final bool? confirmed = await _showReplaceConfirmDialog(
+                        context,
+                        existingSessions.length,
+                      );
+                      if (confirmed != true) {
+                        return;
+                      }
+                      replaceExisting = true;
+                    }
+
                     final int count = await ref
                         .read(scheduleNotifierProvider.notifier)
-                        .importFromImage(uid: uid, source: ImageSource.gallery);
+                        .importFromImage(
+                          uid: uid,
+                          source: ImageSource.gallery,
+                          replaceExisting: replaceExisting,
+                          existingSessions: existingSessions,
+                        );
                     if (context.mounted && count > 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -149,9 +202,27 @@ class TimetableScreen extends ConsumerWidget {
                   subtitle: const Text('Hữu ích khi chạy trên điện thoại'),
                   onTap: () async {
                     Navigator.pop(ctx);
+
+                    bool replaceExisting = false;
+                    if (existingSessions.isNotEmpty) {
+                      final bool? confirmed = await _showReplaceConfirmDialog(
+                        context,
+                        existingSessions.length,
+                      );
+                      if (confirmed != true) {
+                        return;
+                      }
+                      replaceExisting = true;
+                    }
+
                     final int count = await ref
                         .read(scheduleNotifierProvider.notifier)
-                        .importFromImage(uid: uid, source: ImageSource.camera);
+                        .importFromImage(
+                          uid: uid,
+                          source: ImageSource.camera,
+                          replaceExisting: replaceExisting,
+                          existingSessions: existingSessions,
+                        );
                     if (context.mounted && count > 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -173,6 +244,7 @@ class TimetableScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     String uid,
+    List<ClassSessionModel> existingSessions,
   ) async {
     final TextEditingController subjectController = TextEditingController();
     final TextEditingController roomController = TextEditingController();
@@ -298,6 +370,7 @@ class TimetableScreen extends ConsumerWidget {
                           startTime: startController.text.trim(),
                           endTime: endController.text.trim(),
                           room: roomController.text,
+                          existingSessions: existingSessions,
                         );
                     if (ctx.mounted && ok) {
                       Navigator.pop(ctx);
@@ -319,6 +392,195 @@ class TimetableScreen extends ConsumerWidget {
     roomController.dispose();
     startController.dispose();
     endController.dispose();
+  }
+
+  Future<void> _showEditSessionDialog(
+    BuildContext context,
+    WidgetRef ref,
+    String uid,
+    ClassSessionModel session,
+    List<ClassSessionModel> existingSessions,
+  ) async {
+    final TextEditingController subjectController =
+        TextEditingController(text: session.subjectName);
+    final TextEditingController roomController =
+        TextEditingController(text: session.room);
+    final TextEditingController startController =
+        TextEditingController(text: session.startTime);
+    final TextEditingController endController =
+        TextEditingController(text: session.endTime);
+    int dayOfWeek = session.dayOfWeek;
+
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext ctx) {
+        return StatefulBuilder(
+          builder:
+              (BuildContext context, void Function(void Function()) setSt) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: const Text('Sửa buổi học'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    TextField(
+                      controller: subjectController,
+                      decoration: const InputDecoration(
+                        labelText: 'Môn học',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<int>(
+                      value: dayOfWeek,
+                      decoration: const InputDecoration(
+                        labelText: 'Thứ',
+                        border: OutlineInputBorder(),
+                      ),
+                      items: _dayOptions.entries
+                          .map(
+                            (MapEntry<int, String> e) => DropdownMenuItem<int>(
+                              value: e.key,
+                              child: Text(e.value),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (int? value) {
+                        if (value != null) {
+                          setSt(() {
+                            dayOfWeek = value;
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextField(
+                            controller: startController,
+                            readOnly: true,
+                            decoration: const InputDecoration(
+                              labelText: 'Bắt đầu (HH:mm)',
+                              border: OutlineInputBorder(),
+                            ),
+                            onTap: () async {
+                              final TimeOfDay? picked = await showTimePicker(
+                                context: ctx,
+                                initialTime: _parseTime(session.startTime),
+                              );
+                              if (picked != null) {
+                                startController.text = _formatTimeOfDay(picked);
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: endController,
+                            readOnly: true,
+                            decoration: const InputDecoration(
+                              labelText: 'Kết thúc (HH:mm)',
+                              border: OutlineInputBorder(),
+                            ),
+                            onTap: () async {
+                              final TimeOfDay? picked = await showTimePicker(
+                                context: ctx,
+                                initialTime: _parseTime(session.endTime),
+                              );
+                              if (picked != null) {
+                                endController.text = _formatTimeOfDay(picked);
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: roomController,
+                      decoration: const InputDecoration(
+                        labelText: 'Phòng học (tuỳ chọn)',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Huỷ'),
+                ),
+                FilledButton(
+                  onPressed: () async {
+                    final bool ok = await ref
+                        .read(scheduleNotifierProvider.notifier)
+                        .updateSession(
+                          sessionId: session.id,
+                          subjectName: subjectController.text,
+                          dayOfWeek: dayOfWeek,
+                          startTime: startController.text.trim(),
+                          endTime: endController.text.trim(),
+                          room: roomController.text,
+                          existingSessions: existingSessions,
+                        );
+                    if (ctx.mounted && ok) {
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Đã cập nhật buổi học.')),
+                      );
+                    }
+                  },
+                  child: const Text('Lưu'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    subjectController.dispose();
+    roomController.dispose();
+    startController.dispose();
+    endController.dispose();
+  }
+
+  Future<bool?> _showReplaceConfirmDialog(
+    BuildContext context,
+    int oldCount,
+  ) {
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text('Xác nhận thay thế thời khóa biểu'),
+          content: Text(
+            'Bạn đang có $oldCount buổi học. '
+            'Khi nhập ảnh mới, toàn bộ thời khóa biểu cũ sẽ bị xóa và thay bằng dữ liệu mới.\n\n'
+            'Bạn có muốn tiếp tục không?',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Huỷ'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Đồng ý thay thế'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   static Map<int, List<ClassSessionModel>> _groupByDay(
@@ -345,16 +607,25 @@ class TimetableScreen extends ConsumerWidget {
     final String mm = t.minute.toString().padLeft(2, '0');
     return '$hh:$mm';
   }
+
+  static TimeOfDay _parseTime(String hhmm) {
+    final List<String> parts = hhmm.split(':');
+    final int hour = int.tryParse(parts.first) ?? 7;
+    final int minute = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+    return TimeOfDay(hour: hour, minute: minute);
+  }
 }
 
 class _DaySection extends StatelessWidget {
   final int dayOfWeek;
   final List<ClassSessionModel> sessions;
+  final ValueChanged<ClassSessionModel> onEdit;
   final ValueChanged<String> onDelete;
 
   const _DaySection({
     required this.dayOfWeek,
     required this.sessions,
+    required this.onEdit,
     required this.onDelete,
   });
 
@@ -391,10 +662,20 @@ class _DaySection extends StatelessWidget {
                       '${session.room.isNotEmpty ? ' • ${session.room}' : ''}'
                       '${session.isFromOcr ? ' • AI' : ''}',
                     ),
-                    trailing: IconButton(
-                      tooltip: 'Xoá buổi học',
-                      icon: const Icon(Icons.delete_outline_rounded),
-                      onPressed: () => onDelete(session.id),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        IconButton(
+                          tooltip: 'Sửa buổi học',
+                          icon: const Icon(Icons.edit_outlined),
+                          onPressed: () => onEdit(session),
+                        ),
+                        IconButton(
+                          tooltip: 'Xoá buổi học',
+                          icon: const Icon(Icons.delete_outline_rounded),
+                          onPressed: () => onDelete(session.id),
+                        ),
+                      ],
                     ),
                   ),
                 ),
