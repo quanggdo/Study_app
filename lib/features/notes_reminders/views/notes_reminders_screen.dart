@@ -1,15 +1,13 @@
-﻿// Placeholder for notes_reminders/views/notes_reminders_screen.dart
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/responsive_center.dart';
-
-import '../models/note_model.dart';
-import '../models/task_model.dart';
-import '../viewmodels/notes_reminders_viewmodel.dart';
+import 'package:student_academic_assistant/core/theme/app_theme.dart';
+import 'package:student_academic_assistant/core/widgets/responsive_center.dart';
+import 'package:student_academic_assistant/features/notes_reminders/models/note_model.dart';
+import 'package:student_academic_assistant/features/notes_reminders/models/task_model.dart';
+import 'package:student_academic_assistant/features/notes_reminders/viewmodels/notes_reminders_viewmodel.dart';
 
 class NotesRemindersScreen extends ConsumerStatefulWidget {
   const NotesRemindersScreen({super.key});
@@ -971,5 +969,3 @@ class _NotesTab extends StatelessWidget {
     );
   }
 }
-
-

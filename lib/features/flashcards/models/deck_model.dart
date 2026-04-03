@@ -1,1 +1,3 @@
-// Placeholder for flashcards/models/deck_model.dart
+// Backwards-compat barrel for old imports.
+export 'flashcard_deck.dart';
+

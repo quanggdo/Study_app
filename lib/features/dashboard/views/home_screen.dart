@@ -3,10 +3,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/providers/user_provider.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/responsive_center.dart';
-import '../../auth/viewmodels/auth_viewmodel.dart';
+import 'package:student_academic_assistant/core/providers/user_provider.dart';
+import 'package:student_academic_assistant/core/theme/app_theme.dart';
+import 'package:student_academic_assistant/core/widgets/responsive_center.dart';
+import 'package:student_academic_assistant/features/auth/viewmodels/auth_viewmodel.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});

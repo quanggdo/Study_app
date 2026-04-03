@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import '../../../../core/theme/app_theme.dart';
+import 'package:student_academic_assistant/core/theme/app_theme.dart';
 
 class AuthHeader extends StatelessWidget {
   final String title;

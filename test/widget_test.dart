@@ -7,24 +7,29 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:student_academic_assistant/main.dart';
+import 'package:student_academic_assistant/features/flashcards/views/flashcards_screen.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
-
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  testWidgets('Flashcards flow builds smoke test', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: FlashcardsScreen(),
+        ),
+      ),
+    );
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.byType(FlashcardsScreen), findsOneWidget);
+
+    // mở màn tạo deck
+    await tester.tap(find.byIcon(Icons.add_rounded));
+    await tester.pumpAndSettle();
+
+    // Không assert loại cụ thể của CreateDeckScreen để tránh brittle,
+    // chỉ cần không crash và vẫn có AppBar.
+    expect(find.byType(AppBar), findsOneWidget);
   });
 }
