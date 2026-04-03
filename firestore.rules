@@ -7,6 +7,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Đáp án quiz: chỉ Cloud Functions/Admin SDK được đọc/ghi.
+    match /quiz_answers/{quizId} {
+      allow read, write: if false;
+    }
+
     // Flashcards preset (read-only)
     match /flashcards/{fcId} {
       allow read: if request.auth != null;
@@ -38,8 +43,12 @@ service cloud.firestore {
     }
 
     match /user_progress/{docId} {
+      // Người dùng chỉ được đọc tiến độ của chính mình.
       allow read: if request.auth != null && request.auth.uid == resource.data.u_id;
-      allow create: if request.auth != null && request.resource.data.u_id == request.auth.uid;
+
+      // Ghi tiến độ nên do server (Cloud Functions) thực hiện để chống gian lận.
+      // Nếu bạn đang ghi từ app ở các feature khác, hãy tách collection riêng.
+      allow create, update, delete: if false;
     }
 
     match /focus_sessions/{docId} {

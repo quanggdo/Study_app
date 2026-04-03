@@ -150,7 +150,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 delay: 450,
                 isAvailable: true,
-                onTap: () => context.push('/flashcards'),
+                onTap: () => context.push('/study'),
               ),
               _buildFeatureCard(
                 context,
