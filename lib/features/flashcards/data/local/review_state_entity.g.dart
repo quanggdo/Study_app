@@ -15,7 +15,7 @@ extension GetReviewStateEntityCollection on Isar {
 
 const ReviewStateEntitySchema = CollectionSchema(
   name: r'ReviewStateEntity',
-  id: Isar.autoIncrement,
+  id: 3436682584031612012,
   properties: {
     r'cardId': PropertySchema(
       id: 0,

@@ -16,7 +16,7 @@ extension GetFlashcardCardEntityCollection on Isar {
 
 const FlashcardCardEntitySchema = CollectionSchema(
   name: r'FlashcardCardEntity',
-  id: Isar.autoIncrement,
+  id: -3108575913381610349,
   properties: {
     r'back': PropertySchema(
       id: 0,
