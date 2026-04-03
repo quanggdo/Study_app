@@ -47,52 +47,31 @@ class ReviewSessionScreen extends ConsumerWidget {
                           ],
                           const SizedBox(height: 12),
                           Expanded(
-                            child: Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: [
-                                      _CardModeBadge(state: session.current!.state),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        session.current!.card.front,
-                                        style: Theme.of(context).textTheme.titleLarge,
-                                      ),
-                                      const SizedBox(height: 16),
-                                      if (session.showAnswer) ...[
-                                        const Divider(),
-                                        const SizedBox(height: 12),
-                                        Text(
-                                          session.current!.card.back,
-                                          style: Theme.of(context).textTheme.bodyLarge,
-                                        ),
-                                        if (session.current!.card.hint != null)
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 12),
-                                            child: Text(
-                                              'Gợi ý: ${session.current!.card.hint}',
-                                              style: Theme.of(context).textTheme.bodySmall,
-                                            ),
-                                          ),
-                                      ] else ...[
-                                        Text(
-                                          'Nhấn “Hiện đáp án” để xem mặt sau.',
-                                          style: Theme.of(context).textTheme.bodyMedium,
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                ),
+                            child: _FlipCard(
+                              showBack: session.showAnswer,
+                              onToggle: vm.toggleAnswer,
+                              frontChild: _CardFace(
+                                badge: _CardModeBadge(state: session.current!.state),
+                                title: session.current!.card.front,
+                                body: session.current!.card.front,
+                                hint: null,
+                                isBack: false,
+                              ),
+                              backChild: _CardFace(
+                                badge: _CardModeBadge(state: session.current!.state),
+                                title: session.current!.card.front,
+                                body: session.current!.card.back,
+                                hint: session.current!.card.hint,
+                                isBack: true,
                               ),
                             ),
                           ),
                           const SizedBox(height: 12),
                           if (!session.showAnswer)
-                            FilledButton(
-                              onPressed: vm.revealAnswer,
-                              child: const Text('Hiện đáp án'),
+                            Text(
+                              'Chạm vào thẻ để lật và xem đáp án.',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodyMedium,
                             )
                           else
                             _GradeBar(
@@ -368,6 +347,128 @@ class _DoneView extends StatelessWidget {
               child: const Text('Quay lại'),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FlipCard extends StatelessWidget {
+  const _FlipCard({
+    required this.showBack,
+    required this.onToggle,
+    required this.frontChild,
+    required this.backChild,
+  });
+
+  final bool showBack;
+  final VoidCallback onToggle;
+  final Widget frontChild;
+  final Widget backChild;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onToggle,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 320),
+        switchInCurve: Curves.easeOut,
+        switchOutCurve: Curves.easeIn,
+        transitionBuilder: (child, animation) {
+          final rotate = Tween<double>(begin: pi, end: 0).animate(animation);
+          return AnimatedBuilder(
+            animation: rotate,
+            child: child,
+            builder: (context, child) {
+              final isUnder = (ValueKey(showBack) != child?.key);
+              var tilt = (animation.value - 0.5).abs() - 0.5;
+              tilt *= isUnder ? -0.003 : 0.003;
+
+              final value = isUnder ? min(rotate.value, pi / 2) : rotate.value;
+              return Transform(
+                transform: Matrix4.identity()
+                  ..setEntry(3, 2, 0.001)
+                  ..rotateY(value)
+                  ..setEntry(3, 0, tilt),
+                alignment: Alignment.center,
+                child: child,
+              );
+            },
+          );
+        },
+        layoutBuilder: (currentChild, previousChildren) {
+          return Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              ...previousChildren,
+              if (currentChild != null) currentChild,
+            ],
+          );
+        },
+        child: showBack
+            ? KeyedSubtree(
+                key: const ValueKey(true),
+                child: backChild,
+              )
+            : KeyedSubtree(
+                key: const ValueKey(false),
+                child: frontChild,
+              ),
+      ),
+    );
+  }
+}
+
+class _CardFace extends StatelessWidget {
+  const _CardFace({
+    required this.badge,
+    required this.title,
+    required this.body,
+    required this.hint,
+    required this.isBack,
+  });
+
+  final Widget badge;
+  final String title;
+  final String body;
+  final String? hint;
+  final bool isBack;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              badge,
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 16),
+              if (isBack) ...[
+                const Divider(),
+                const SizedBox(height: 12),
+              ],
+              Text(
+                body,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              if (hint != null && hint!.trim().isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Text(
+                    'Gợi ý: $hint',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

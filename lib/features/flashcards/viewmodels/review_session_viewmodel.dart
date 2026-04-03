@@ -108,6 +108,11 @@ class ReviewSessionViewModel extends StateNotifier<ReviewSessionState> {
     state = state.copyWith(showAnswer: true);
   }
 
+  void toggleAnswer() {
+    if (state.current == null) return;
+    state = state.copyWith(showAnswer: !state.showAnswer);
+  }
+
   String _formatScheduleMessage({
     required DateTime now,
     required ReviewState next,
