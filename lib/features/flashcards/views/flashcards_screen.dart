@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../viewmodels/flashcard_deck_list_viewmodel.dart';
-import 'create_deck_screen.dart';
 import 'deck_detail_screen.dart';
 
 class FlashcardsScreen extends ConsumerWidget {
@@ -15,23 +14,13 @@ class FlashcardsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flashcards'),
-        actions: [
-          IconButton(
-            tooltip: 'Tạo bộ thẻ',
-            icon: const Icon(Icons.add_rounded),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const CreateDeckScreen()),
-              );
-            },
-          ),
-        ],
+        actions: const [],
       ),
       body: decksAsync.when(
         data: (decks) {
           if (decks.isEmpty) {
             return const Center(
-              child: Text('Chưa có bộ thẻ nào. Hãy tạo bộ thẻ đầu tiên!'),
+              child: Text('Chưa có bộ thẻ nào trong Firestore.'),
             );
           }
           return ListView.separated(

@@ -9,27 +9,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:student_academic_assistant/features/flashcards/views/flashcards_screen.dart';
+import 'package:student_academic_assistant/features/flashcards/views/create_card_screen.dart';
 
 void main() {
-  testWidgets('Flashcards flow builds smoke test', (WidgetTester tester) async {
+  testWidgets('CreateCardScreen builds smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(
       const ProviderScope(
         child: MaterialApp(
-          home: FlashcardsScreen(),
+          home: CreateCardScreen(deckId: 'deck-id'),
         ),
       ),
     );
-    await tester.pump();
 
-    expect(find.byType(FlashcardsScreen), findsOneWidget);
-
-    // mở màn tạo deck
-    await tester.tap(find.byIcon(Icons.add_rounded));
-    await tester.pumpAndSettle();
-
-    // Không assert loại cụ thể của CreateDeckScreen để tránh brittle,
-    // chỉ cần không crash và vẫn có AppBar.
-    expect(find.byType(AppBar), findsOneWidget);
+    expect(find.byType(CreateCardScreen), findsOneWidget);
+    expect(find.text('Thêm thẻ'), findsOneWidget);
   });
 }

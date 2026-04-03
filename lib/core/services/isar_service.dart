@@ -1,10 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../../features/flashcards/data/local/flashcard_card_entity.dart';
-import '../../features/flashcards/data/local/flashcard_deck_entity.dart';
-import '../../features/flashcards/data/local/review_state_entity.dart';
+import 'isar_schemas_stub.dart'
+    if (dart.library.io) 'isar_schemas_io.dart';
 
 /// Central place to open/keep the Isar instance.
 ///
@@ -15,14 +15,15 @@ class IsarService {
   final Isar isar;
 
   static Future<IsarService> open() async {
-    final dir = await getApplicationDocumentsDirectory();
+    if (kIsWeb) {
+      throw UnsupportedError(
+        'Isar is not supported on Web in this project configuration.',
+      );
+    }
 
+    final dir = await getApplicationDocumentsDirectory();
     final isar = await Isar.open(
-      [
-        FlashcardDeckEntitySchema,
-        FlashcardCardEntitySchema,
-        ReviewStateEntitySchema,
-      ],
+      isarSchemas,
       directory: dir.path,
     );
 
@@ -35,4 +36,3 @@ final isarServiceProvider = Provider<IsarService>((ref) {
     'isarServiceProvider must be overridden in main() after opening Isar',
   );
 });
-

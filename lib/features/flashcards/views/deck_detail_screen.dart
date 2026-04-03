@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/flashcard_deck.dart';
 import '../viewmodels/deck_detail_viewmodel.dart';
-import 'create_card_screen.dart';
+import 'review_session_screen.dart';
 
 class DeckDetailScreen extends ConsumerWidget {
   const DeckDetailScreen({
@@ -22,12 +22,15 @@ class DeckDetailScreen extends ConsumerWidget {
         title: Text(deck.title),
         actions: [
           IconButton(
-            tooltip: 'Thêm thẻ',
-            icon: const Icon(Icons.add_rounded),
+            tooltip: 'Ôn tập',
+            icon: const Icon(Icons.play_circle_fill_rounded),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (_) => CreateCardScreen(deckId: deck.id),
+                  builder: (_) => ReviewSessionScreen(
+                    deckId: deck.id,
+                    deckTitle: deck.title,
+                  ),
                 ),
               );
             },
@@ -63,4 +66,3 @@ class DeckDetailScreen extends ConsumerWidget {
     );
   }
 }
-

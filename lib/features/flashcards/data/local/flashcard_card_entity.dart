@@ -3,6 +3,7 @@ import 'package:isar/isar.dart';
 part 'flashcard_card_entity.g.dart';
 
 @collection
+@pragma('vm:entry-point')
 class FlashcardCardEntity {
   FlashcardCardEntity({
     required this.id,
@@ -18,13 +19,13 @@ class FlashcardCardEntity {
 
   Id isarId = Isar.autoIncrement;
 
-  @Index(unique: true, replace: true)
+  @Index(unique: true, replace: true, name: 'card_id_idx')
   late String id;
 
-  @Index()
+  @Index(name: 'card_deck_id_idx')
   late String deckId;
 
-  @Index()
+  @Index(name: 'card_u_id_idx')
   late String uId;
 
   late String front;
@@ -34,7 +35,9 @@ class FlashcardCardEntity {
   late DateTime createdAt;
   late DateTime updatedAt;
 
-  @Index()
+  @Index(name: 'card_is_deleted_idx')
   late bool isDeleted;
 }
 
+// Nếu build web: không dùng Isar, nên tránh việc reference tới schema.
+// (File .g.dart vẫn tồn tại cho mobile/desktop builds.)

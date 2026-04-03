@@ -3,6 +3,7 @@ import 'package:isar/isar.dart';
 part 'review_state_entity.g.dart';
 
 @collection
+@pragma('vm:entry-point')
 class ReviewStateEntity {
   ReviewStateEntity({
     required this.cardId,
@@ -20,13 +21,13 @@ class ReviewStateEntity {
 
   Id isarId = Isar.autoIncrement;
 
-  @Index(unique: true, replace: true)
+  @Index(unique: true, replace: true, name: 'card_id_idx')
   late String cardId;
 
-  @Index()
+  @Index(name: 'deck_id_idx')
   late String deckId;
 
-  @Index()
+  @Index(name: 'u_id_idx')
   late String uId;
 
   late DateTime dueAt;
@@ -37,7 +38,6 @@ class ReviewStateEntity {
   DateTime? lastReviewedAt;
   late DateTime updatedAt;
 
-  @Index()
+  @Index(name: 'is_deleted_idx')
   late bool isDeleted;
 }
-

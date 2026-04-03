@@ -27,6 +27,8 @@ mixin _$ReviewState {
   int get reps => throw _privateConstructorUsedError;
   int get lapses => throw _privateConstructorUsedError;
   int get intervalDays => throw _privateConstructorUsedError;
+  int get intervalMinutes => throw _privateConstructorUsedError;
+  ReviewStateType get stateType => throw _privateConstructorUsedError;
   double get easeFactor => throw _privateConstructorUsedError;
   DateTime? get lastReviewedAt => throw _privateConstructorUsedError;
   DateTime get updatedAt => throw _privateConstructorUsedError;
@@ -52,6 +54,8 @@ abstract class $ReviewStateCopyWith<$Res> {
       int reps,
       int lapses,
       int intervalDays,
+      int intervalMinutes,
+      ReviewStateType stateType,
       double easeFactor,
       DateTime? lastReviewedAt,
       DateTime updatedAt,
@@ -78,6 +82,8 @@ class _$ReviewStateCopyWithImpl<$Res, $Val extends ReviewState>
     Object? reps = null,
     Object? lapses = null,
     Object? intervalDays = null,
+    Object? intervalMinutes = null,
+    Object? stateType = null,
     Object? easeFactor = null,
     Object? lastReviewedAt = freezed,
     Object? updatedAt = null,
@@ -112,6 +118,14 @@ class _$ReviewStateCopyWithImpl<$Res, $Val extends ReviewState>
           ? _value.intervalDays
           : intervalDays // ignore: cast_nullable_to_non_nullable
               as int,
+      intervalMinutes: null == intervalMinutes
+          ? _value.intervalMinutes
+          : intervalMinutes // ignore: cast_nullable_to_non_nullable
+              as int,
+      stateType: null == stateType
+          ? _value.stateType
+          : stateType // ignore: cast_nullable_to_non_nullable
+              as ReviewStateType,
       easeFactor: null == easeFactor
           ? _value.easeFactor
           : easeFactor // ignore: cast_nullable_to_non_nullable
@@ -148,6 +162,8 @@ abstract class _$$ReviewStateImplCopyWith<$Res>
       int reps,
       int lapses,
       int intervalDays,
+      int intervalMinutes,
+      ReviewStateType stateType,
       double easeFactor,
       DateTime? lastReviewedAt,
       DateTime updatedAt,
@@ -172,6 +188,8 @@ class __$$ReviewStateImplCopyWithImpl<$Res>
     Object? reps = null,
     Object? lapses = null,
     Object? intervalDays = null,
+    Object? intervalMinutes = null,
+    Object? stateType = null,
     Object? easeFactor = null,
     Object? lastReviewedAt = freezed,
     Object? updatedAt = null,
@@ -206,6 +224,14 @@ class __$$ReviewStateImplCopyWithImpl<$Res>
           ? _value.intervalDays
           : intervalDays // ignore: cast_nullable_to_non_nullable
               as int,
+      intervalMinutes: null == intervalMinutes
+          ? _value.intervalMinutes
+          : intervalMinutes // ignore: cast_nullable_to_non_nullable
+              as int,
+      stateType: null == stateType
+          ? _value.stateType
+          : stateType // ignore: cast_nullable_to_non_nullable
+              as ReviewStateType,
       easeFactor: null == easeFactor
           ? _value.easeFactor
           : easeFactor // ignore: cast_nullable_to_non_nullable
@@ -237,6 +263,8 @@ class _$ReviewStateImpl implements _ReviewState {
       this.reps = 0,
       this.lapses = 0,
       this.intervalDays = 0,
+      this.intervalMinutes = 0,
+      this.stateType = ReviewStateType.learning,
       this.easeFactor = 2.5,
       this.lastReviewedAt,
       required this.updatedAt,
@@ -264,6 +292,12 @@ class _$ReviewStateImpl implements _ReviewState {
   final int intervalDays;
   @override
   @JsonKey()
+  final int intervalMinutes;
+  @override
+  @JsonKey()
+  final ReviewStateType stateType;
+  @override
+  @JsonKey()
   final double easeFactor;
   @override
   final DateTime? lastReviewedAt;
@@ -275,7 +309,7 @@ class _$ReviewStateImpl implements _ReviewState {
 
   @override
   String toString() {
-    return 'ReviewState(cardId: $cardId, deckId: $deckId, uId: $uId, dueAt: $dueAt, reps: $reps, lapses: $lapses, intervalDays: $intervalDays, easeFactor: $easeFactor, lastReviewedAt: $lastReviewedAt, updatedAt: $updatedAt, isDeleted: $isDeleted)';
+    return 'ReviewState(cardId: $cardId, deckId: $deckId, uId: $uId, dueAt: $dueAt, reps: $reps, lapses: $lapses, intervalDays: $intervalDays, intervalMinutes: $intervalMinutes, stateType: $stateType, easeFactor: $easeFactor, lastReviewedAt: $lastReviewedAt, updatedAt: $updatedAt, isDeleted: $isDeleted)';
   }
 
   @override
@@ -291,6 +325,10 @@ class _$ReviewStateImpl implements _ReviewState {
             (identical(other.lapses, lapses) || other.lapses == lapses) &&
             (identical(other.intervalDays, intervalDays) ||
                 other.intervalDays == intervalDays) &&
+            (identical(other.intervalMinutes, intervalMinutes) ||
+                other.intervalMinutes == intervalMinutes) &&
+            (identical(other.stateType, stateType) ||
+                other.stateType == stateType) &&
             (identical(other.easeFactor, easeFactor) ||
                 other.easeFactor == easeFactor) &&
             (identical(other.lastReviewedAt, lastReviewedAt) ||
@@ -303,8 +341,21 @@ class _$ReviewStateImpl implements _ReviewState {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, cardId, deckId, uId, dueAt, reps,
-      lapses, intervalDays, easeFactor, lastReviewedAt, updatedAt, isDeleted);
+  int get hashCode => Object.hash(
+      runtimeType,
+      cardId,
+      deckId,
+      uId,
+      dueAt,
+      reps,
+      lapses,
+      intervalDays,
+      intervalMinutes,
+      stateType,
+      easeFactor,
+      lastReviewedAt,
+      updatedAt,
+      isDeleted);
 
   @JsonKey(ignore: true)
   @override
@@ -329,6 +380,8 @@ abstract class _ReviewState implements ReviewState {
       final int reps,
       final int lapses,
       final int intervalDays,
+      final int intervalMinutes,
+      final ReviewStateType stateType,
       final double easeFactor,
       final DateTime? lastReviewedAt,
       required final DateTime updatedAt,
@@ -351,6 +404,10 @@ abstract class _ReviewState implements ReviewState {
   int get lapses;
   @override
   int get intervalDays;
+  @override
+  int get intervalMinutes;
+  @override
+  ReviewStateType get stateType;
   @override
   double get easeFactor;
   @override

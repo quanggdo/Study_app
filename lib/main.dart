@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -14,16 +15,22 @@ void main() async {
   tz.initializeTimeZones();
 
   await FirebaseAuthService.initialize();
-  final isarService = await IsarService.open();
+
   final notificationService = NotificationService();
   await notificationService.initialize();
 
+  final overrides = <Override>[
+    notificationServiceProvider.overrideWithValue(notificationService),
+  ];
+
+  if (!kIsWeb) {
+    final isarService = await IsarService.open();
+    overrides.add(isarServiceProvider.overrideWithValue(isarService));
+  }
+
   runApp(
     ProviderScope(
-      overrides: [
-        notificationServiceProvider.overrideWithValue(notificationService),
-        isarServiceProvider.overrideWithValue(isarService),
-      ],
+      overrides: overrides,
       child: StudentAcademicAssistantApp(),
     ),
   );

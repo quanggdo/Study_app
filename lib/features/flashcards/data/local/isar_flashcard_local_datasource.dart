@@ -2,8 +2,11 @@ import 'package:isar/isar.dart';
 
 import '../../models/flashcard_card.dart';
 import '../../models/flashcard_deck.dart';
+import '../../models/due_card.dart';
+import '../../models/review_state.dart';
 import 'flashcard_card_entity.dart';
 import 'flashcard_deck_entity.dart';
+import 'review_state_entity.dart';
 
 class IsarFlashcardLocalDatasource {
   IsarFlashcardLocalDatasource(this._isar);
@@ -117,5 +120,157 @@ class IsarFlashcardLocalDatasource {
 
       await _isar.flashcardDeckEntitys.put(entity);
     });
+  }
+
+  Future<ReviewState?> getReviewState({required String cardId}) async {
+    final entity = await _isar.reviewStateEntitys
+        .where()
+        .cardIdEqualTo(cardId)
+        .findFirst();
+
+    if (entity == null || entity.isDeleted) return null;
+
+    return ReviewState(
+      cardId: entity.cardId,
+      deckId: entity.deckId,
+      uId: entity.uId,
+      dueAt: entity.dueAt,
+      reps: entity.reps,
+      lapses: entity.lapses,
+      intervalDays: entity.intervalDays,
+      easeFactor: entity.easeFactor,
+      lastReviewedAt: entity.lastReviewedAt,
+      updatedAt: entity.updatedAt,
+      isDeleted: entity.isDeleted,
+    );
+  }
+
+  Future<ReviewState> getOrCreateReviewState({
+    required String uId,
+    required String deckId,
+    required String cardId,
+    DateTime? now,
+  }) async {
+    final existing = await getReviewState(cardId: cardId);
+    if (existing != null) return existing;
+
+    final t = now ?? DateTime.now();
+    final created = ReviewState(
+      cardId: cardId,
+      deckId: deckId,
+      uId: uId,
+      dueAt: t,
+      updatedAt: t,
+    );
+
+    await upsertReviewState(created);
+    return created;
+  }
+
+  Future<void> upsertReviewState(ReviewState state) async {
+    await _isar.writeTxn(() async {
+      final entity = ReviewStateEntity(
+        cardId: state.cardId,
+        deckId: state.deckId,
+        uId: state.uId,
+        dueAt: state.dueAt,
+        reps: state.reps,
+        lapses: state.lapses,
+        intervalDays: state.intervalDays,
+        easeFactor: state.easeFactor,
+        lastReviewedAt: state.lastReviewedAt,
+        updatedAt: state.updatedAt,
+        isDeleted: state.isDeleted,
+      );
+
+      await _isar.reviewStateEntitys.putByCardId(entity);
+
+      // best-effort: cập nhật lastStudiedAt cho deck
+      final deck = await _isar.flashcardDeckEntitys
+          .where()
+          .idEqualTo(state.deckId)
+          .findFirst();
+      if (deck != null) {
+        final t = DateTime.now();
+        deck.lastStudiedAt = t;
+        deck.updatedAt = t;
+        await _isar.flashcardDeckEntitys.put(deck);
+      }
+    });
+  }
+
+  Future<List<DueCard>> getDueCards({
+    required String uId,
+    required String deckId,
+    required DateTime now,
+    int limit = 20,
+  }) async {
+    final cards = await _isar.flashcardCardEntitys
+        .where()
+        .deckIdEqualTo(deckId)
+        .filter()
+        .uIdEqualTo(uId)
+        .isDeletedEqualTo(false)
+        .findAll();
+
+    if (cards.isEmpty) return const [];
+
+    final states = await _isar.reviewStateEntitys
+        .where()
+        .deckIdEqualTo(deckId)
+        .filter()
+        .uIdEqualTo(uId)
+        .isDeletedEqualTo(false)
+        .findAll();
+
+    final byCardId = <String, ReviewStateEntity>{
+      for (final s in states) s.cardId: s,
+    };
+
+    final result = <DueCard>[];
+    for (final c in cards) {
+      final s = byCardId[c.id];
+
+      ReviewState? state;
+      if (s != null) {
+        state = ReviewState(
+          cardId: s.cardId,
+          deckId: s.deckId,
+          uId: s.uId,
+          dueAt: s.dueAt,
+          reps: s.reps,
+          lapses: s.lapses,
+          intervalDays: s.intervalDays,
+          easeFactor: s.easeFactor,
+          lastReviewedAt: s.lastReviewedAt,
+          updatedAt: s.updatedAt,
+          isDeleted: s.isDeleted,
+        );
+      }
+
+      final isDue = state == null || !state.dueAt.isAfter(now);
+      if (!isDue) continue;
+
+      result.add(
+        DueCard(
+          card: FlashcardCard(
+            id: c.id,
+            deckId: c.deckId,
+            uId: c.uId,
+            front: c.front,
+            back: c.back,
+            hint: c.hint,
+            createdAt: c.createdAt,
+            updatedAt: c.updatedAt,
+            isDeleted: c.isDeleted,
+          ),
+          state: state,
+        ),
+      );
+
+      if (result.length >= limit) break;
+    }
+
+    return result;
   }
 }

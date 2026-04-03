@@ -83,7 +83,8 @@ dev_dependencies:
 
 dependency_overrides:
   js: ^0.6.7
-
+  isar_flutter_libs:
+    path: third_party/isar_flutter_libs
 
 flutter:
   uses-material-design: true

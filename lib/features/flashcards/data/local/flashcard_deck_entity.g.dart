@@ -75,9 +75,9 @@ const FlashcardDeckEntitySchema = CollectionSchema(
   deserializeProp: _flashcardDeckEntityDeserializeProp,
   idName: r'isarId',
   indexes: {
-    r'id': IndexSchema(
-      id: -3268401673993471357,
-      name: r'id',
+    r'deck_id_idx': IndexSchema(
+      id: -5581909355875262112,
+      name: r'deck_id_idx',
       unique: true,
       replace: true,
       properties: [
@@ -88,9 +88,9 @@ const FlashcardDeckEntitySchema = CollectionSchema(
         )
       ],
     ),
-    r'uId': IndexSchema(
-      id: -6381944791387401838,
-      name: r'uId',
+    r'deck_u_id_idx': IndexSchema(
+      id: -5411826251668874556,
+      name: r'deck_u_id_idx',
       unique: false,
       replace: false,
       properties: [
@@ -101,9 +101,9 @@ const FlashcardDeckEntitySchema = CollectionSchema(
         )
       ],
     ),
-    r'isDeleted': IndexSchema(
-      id: -786475870904832312,
-      name: r'isDeleted',
+    r'deck_is_deleted_idx': IndexSchema(
+      id: 6403565679830779963,
+      name: r'deck_is_deleted_idx',
       unique: false,
       replace: false,
       properties: [
@@ -236,56 +236,56 @@ void _flashcardDeckEntityAttach(
 
 extension FlashcardDeckEntityByIndex on IsarCollection<FlashcardDeckEntity> {
   Future<FlashcardDeckEntity?> getById(String id) {
-    return getByIndex(r'id', [id]);
+    return getByIndex(r'deck_id_idx', [id]);
   }
 
   FlashcardDeckEntity? getByIdSync(String id) {
-    return getByIndexSync(r'id', [id]);
+    return getByIndexSync(r'deck_id_idx', [id]);
   }
 
   Future<bool> deleteById(String id) {
-    return deleteByIndex(r'id', [id]);
+    return deleteByIndex(r'deck_id_idx', [id]);
   }
 
   bool deleteByIdSync(String id) {
-    return deleteByIndexSync(r'id', [id]);
+    return deleteByIndexSync(r'deck_id_idx', [id]);
   }
 
   Future<List<FlashcardDeckEntity?>> getAllById(List<String> idValues) {
     final values = idValues.map((e) => [e]).toList();
-    return getAllByIndex(r'id', values);
+    return getAllByIndex(r'deck_id_idx', values);
   }
 
   List<FlashcardDeckEntity?> getAllByIdSync(List<String> idValues) {
     final values = idValues.map((e) => [e]).toList();
-    return getAllByIndexSync(r'id', values);
+    return getAllByIndexSync(r'deck_id_idx', values);
   }
 
   Future<int> deleteAllById(List<String> idValues) {
     final values = idValues.map((e) => [e]).toList();
-    return deleteAllByIndex(r'id', values);
+    return deleteAllByIndex(r'deck_id_idx', values);
   }
 
   int deleteAllByIdSync(List<String> idValues) {
     final values = idValues.map((e) => [e]).toList();
-    return deleteAllByIndexSync(r'id', values);
+    return deleteAllByIndexSync(r'deck_id_idx', values);
   }
 
   Future<Id> putById(FlashcardDeckEntity object) {
-    return putByIndex(r'id', object);
+    return putByIndex(r'deck_id_idx', object);
   }
 
   Id putByIdSync(FlashcardDeckEntity object, {bool saveLinks = true}) {
-    return putByIndexSync(r'id', object, saveLinks: saveLinks);
+    return putByIndexSync(r'deck_id_idx', object, saveLinks: saveLinks);
   }
 
   Future<List<Id>> putAllById(List<FlashcardDeckEntity> objects) {
-    return putAllByIndex(r'id', objects);
+    return putAllByIndex(r'deck_id_idx', objects);
   }
 
   List<Id> putAllByIdSync(List<FlashcardDeckEntity> objects,
       {bool saveLinks = true}) {
-    return putAllByIndexSync(r'id', objects, saveLinks: saveLinks);
+    return putAllByIndexSync(r'deck_id_idx', objects, saveLinks: saveLinks);
   }
 }
 
@@ -302,7 +302,7 @@ extension FlashcardDeckEntityQueryWhereSort
       anyIsDeleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
-        const IndexWhereClause.any(indexName: r'isDeleted'),
+        const IndexWhereClause.any(indexName: r'deck_is_deleted_idx'),
       );
     });
   }
@@ -382,7 +382,7 @@ extension FlashcardDeckEntityQueryWhere
       idEqualTo(String id) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'id',
+        indexName: r'deck_id_idx',
         value: [id],
       ));
     });
@@ -394,13 +394,13 @@ extension FlashcardDeckEntityQueryWhere
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'id',
+              indexName: r'deck_id_idx',
               lower: [],
               upper: [id],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'id',
+              indexName: r'deck_id_idx',
               lower: [id],
               includeLower: false,
               upper: [],
@@ -408,13 +408,13 @@ extension FlashcardDeckEntityQueryWhere
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'id',
+              indexName: r'deck_id_idx',
               lower: [id],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'id',
+              indexName: r'deck_id_idx',
               lower: [],
               upper: [id],
               includeUpper: false,
@@ -427,7 +427,7 @@ extension FlashcardDeckEntityQueryWhere
       uIdEqualTo(String uId) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'uId',
+        indexName: r'deck_u_id_idx',
         value: [uId],
       ));
     });
@@ -439,13 +439,13 @@ extension FlashcardDeckEntityQueryWhere
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uId',
+              indexName: r'deck_u_id_idx',
               lower: [],
               upper: [uId],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uId',
+              indexName: r'deck_u_id_idx',
               lower: [uId],
               includeLower: false,
               upper: [],
@@ -453,13 +453,13 @@ extension FlashcardDeckEntityQueryWhere
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uId',
+              indexName: r'deck_u_id_idx',
               lower: [uId],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uId',
+              indexName: r'deck_u_id_idx',
               lower: [],
               upper: [uId],
               includeUpper: false,
@@ -472,7 +472,7 @@ extension FlashcardDeckEntityQueryWhere
       isDeletedEqualTo(bool isDeleted) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'isDeleted',
+        indexName: r'deck_is_deleted_idx',
         value: [isDeleted],
       ));
     });
@@ -484,13 +484,13 @@ extension FlashcardDeckEntityQueryWhere
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isDeleted',
+              indexName: r'deck_is_deleted_idx',
               lower: [],
               upper: [isDeleted],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isDeleted',
+              indexName: r'deck_is_deleted_idx',
               lower: [isDeleted],
               includeLower: false,
               upper: [],
@@ -498,13 +498,13 @@ extension FlashcardDeckEntityQueryWhere
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isDeleted',
+              indexName: r'deck_is_deleted_idx',
               lower: [isDeleted],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isDeleted',
+              indexName: r'deck_is_deleted_idx',
               lower: [],
               upper: [isDeleted],
               includeUpper: false,

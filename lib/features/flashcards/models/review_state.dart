@@ -3,6 +3,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'review_state.freezed.dart';
 part 'review_state.g.dart';
 
+enum ReviewStateType { learning, review }
+
 @freezed
 class ReviewState with _$ReviewState {
   const factory ReviewState({
@@ -13,6 +15,8 @@ class ReviewState with _$ReviewState {
     @Default(0) int reps,
     @Default(0) int lapses,
     @Default(0) int intervalDays,
+    @Default(0) int intervalMinutes,
+    @Default(ReviewStateType.learning) ReviewStateType stateType,
     @Default(2.5) double easeFactor,
     DateTime? lastReviewedAt,
     required DateTime updatedAt,

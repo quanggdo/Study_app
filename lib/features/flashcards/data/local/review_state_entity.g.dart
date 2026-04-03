@@ -79,9 +79,9 @@ const ReviewStateEntitySchema = CollectionSchema(
   deserializeProp: _reviewStateEntityDeserializeProp,
   idName: r'isarId',
   indexes: {
-    r'cardId': IndexSchema(
-      id: -8501089313549364976,
-      name: r'cardId',
+    r'card_id_idx': IndexSchema(
+      id: 320930630835636536,
+      name: r'card_id_idx',
       unique: true,
       replace: true,
       properties: [
@@ -92,9 +92,9 @@ const ReviewStateEntitySchema = CollectionSchema(
         )
       ],
     ),
-    r'deckId': IndexSchema(
-      id: -1182505463565197889,
-      name: r'deckId',
+    r'deck_id_idx': IndexSchema(
+      id: -5581909355875262112,
+      name: r'deck_id_idx',
       unique: false,
       replace: false,
       properties: [
@@ -105,9 +105,9 @@ const ReviewStateEntitySchema = CollectionSchema(
         )
       ],
     ),
-    r'uId': IndexSchema(
-      id: -6381944791387401838,
-      name: r'uId',
+    r'u_id_idx': IndexSchema(
+      id: 3717130413979739643,
+      name: r'u_id_idx',
       unique: false,
       replace: false,
       properties: [
@@ -118,9 +118,9 @@ const ReviewStateEntitySchema = CollectionSchema(
         )
       ],
     ),
-    r'isDeleted': IndexSchema(
-      id: -786475870904832312,
-      name: r'isDeleted',
+    r'is_deleted_idx': IndexSchema(
+      id: -469673927036594169,
+      name: r'is_deleted_idx',
       unique: false,
       replace: false,
       properties: [
@@ -244,56 +244,56 @@ void _reviewStateEntityAttach(
 
 extension ReviewStateEntityByIndex on IsarCollection<ReviewStateEntity> {
   Future<ReviewStateEntity?> getByCardId(String cardId) {
-    return getByIndex(r'cardId', [cardId]);
+    return getByIndex(r'card_id_idx', [cardId]);
   }
 
   ReviewStateEntity? getByCardIdSync(String cardId) {
-    return getByIndexSync(r'cardId', [cardId]);
+    return getByIndexSync(r'card_id_idx', [cardId]);
   }
 
   Future<bool> deleteByCardId(String cardId) {
-    return deleteByIndex(r'cardId', [cardId]);
+    return deleteByIndex(r'card_id_idx', [cardId]);
   }
 
   bool deleteByCardIdSync(String cardId) {
-    return deleteByIndexSync(r'cardId', [cardId]);
+    return deleteByIndexSync(r'card_id_idx', [cardId]);
   }
 
   Future<List<ReviewStateEntity?>> getAllByCardId(List<String> cardIdValues) {
     final values = cardIdValues.map((e) => [e]).toList();
-    return getAllByIndex(r'cardId', values);
+    return getAllByIndex(r'card_id_idx', values);
   }
 
   List<ReviewStateEntity?> getAllByCardIdSync(List<String> cardIdValues) {
     final values = cardIdValues.map((e) => [e]).toList();
-    return getAllByIndexSync(r'cardId', values);
+    return getAllByIndexSync(r'card_id_idx', values);
   }
 
   Future<int> deleteAllByCardId(List<String> cardIdValues) {
     final values = cardIdValues.map((e) => [e]).toList();
-    return deleteAllByIndex(r'cardId', values);
+    return deleteAllByIndex(r'card_id_idx', values);
   }
 
   int deleteAllByCardIdSync(List<String> cardIdValues) {
     final values = cardIdValues.map((e) => [e]).toList();
-    return deleteAllByIndexSync(r'cardId', values);
+    return deleteAllByIndexSync(r'card_id_idx', values);
   }
 
   Future<Id> putByCardId(ReviewStateEntity object) {
-    return putByIndex(r'cardId', object);
+    return putByIndex(r'card_id_idx', object);
   }
 
   Id putByCardIdSync(ReviewStateEntity object, {bool saveLinks = true}) {
-    return putByIndexSync(r'cardId', object, saveLinks: saveLinks);
+    return putByIndexSync(r'card_id_idx', object, saveLinks: saveLinks);
   }
 
   Future<List<Id>> putAllByCardId(List<ReviewStateEntity> objects) {
-    return putAllByIndex(r'cardId', objects);
+    return putAllByIndex(r'card_id_idx', objects);
   }
 
   List<Id> putAllByCardIdSync(List<ReviewStateEntity> objects,
       {bool saveLinks = true}) {
-    return putAllByIndexSync(r'cardId', objects, saveLinks: saveLinks);
+    return putAllByIndexSync(r'card_id_idx', objects, saveLinks: saveLinks);
   }
 }
 
@@ -309,7 +309,7 @@ extension ReviewStateEntityQueryWhereSort
       anyIsDeleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
-        const IndexWhereClause.any(indexName: r'isDeleted'),
+        const IndexWhereClause.any(indexName: r'is_deleted_idx'),
       );
     });
   }
@@ -389,7 +389,7 @@ extension ReviewStateEntityQueryWhere
       cardIdEqualTo(String cardId) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'cardId',
+        indexName: r'card_id_idx',
         value: [cardId],
       ));
     });
@@ -401,13 +401,13 @@ extension ReviewStateEntityQueryWhere
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'cardId',
+              indexName: r'card_id_idx',
               lower: [],
               upper: [cardId],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'cardId',
+              indexName: r'card_id_idx',
               lower: [cardId],
               includeLower: false,
               upper: [],
@@ -415,13 +415,13 @@ extension ReviewStateEntityQueryWhere
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'cardId',
+              indexName: r'card_id_idx',
               lower: [cardId],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'cardId',
+              indexName: r'card_id_idx',
               lower: [],
               upper: [cardId],
               includeUpper: false,
@@ -434,7 +434,7 @@ extension ReviewStateEntityQueryWhere
       deckIdEqualTo(String deckId) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'deckId',
+        indexName: r'deck_id_idx',
         value: [deckId],
       ));
     });
@@ -446,13 +446,13 @@ extension ReviewStateEntityQueryWhere
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'deckId',
+              indexName: r'deck_id_idx',
               lower: [],
               upper: [deckId],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'deckId',
+              indexName: r'deck_id_idx',
               lower: [deckId],
               includeLower: false,
               upper: [],
@@ -460,13 +460,13 @@ extension ReviewStateEntityQueryWhere
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'deckId',
+              indexName: r'deck_id_idx',
               lower: [deckId],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'deckId',
+              indexName: r'deck_id_idx',
               lower: [],
               upper: [deckId],
               includeUpper: false,
@@ -479,7 +479,7 @@ extension ReviewStateEntityQueryWhere
       uIdEqualTo(String uId) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'uId',
+        indexName: r'u_id_idx',
         value: [uId],
       ));
     });
@@ -491,13 +491,13 @@ extension ReviewStateEntityQueryWhere
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uId',
+              indexName: r'u_id_idx',
               lower: [],
               upper: [uId],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uId',
+              indexName: r'u_id_idx',
               lower: [uId],
               includeLower: false,
               upper: [],
@@ -505,13 +505,13 @@ extension ReviewStateEntityQueryWhere
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uId',
+              indexName: r'u_id_idx',
               lower: [uId],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uId',
+              indexName: r'u_id_idx',
               lower: [],
               upper: [uId],
               includeUpper: false,
@@ -524,7 +524,7 @@ extension ReviewStateEntityQueryWhere
       isDeletedEqualTo(bool isDeleted) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'isDeleted',
+        indexName: r'is_deleted_idx',
         value: [isDeleted],
       ));
     });
@@ -536,13 +536,13 @@ extension ReviewStateEntityQueryWhere
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isDeleted',
+              indexName: r'is_deleted_idx',
               lower: [],
               upper: [isDeleted],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isDeleted',
+              indexName: r'is_deleted_idx',
               lower: [isDeleted],
               includeLower: false,
               upper: [],
@@ -550,13 +550,13 @@ extension ReviewStateEntityQueryWhere
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isDeleted',
+              indexName: r'is_deleted_idx',
               lower: [isDeleted],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isDeleted',
+              indexName: r'is_deleted_idx',
               lower: [],
               upper: [isDeleted],
               includeUpper: false,

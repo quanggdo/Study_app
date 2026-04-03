@@ -70,9 +70,9 @@ const FlashcardCardEntitySchema = CollectionSchema(
   deserializeProp: _flashcardCardEntityDeserializeProp,
   idName: r'isarId',
   indexes: {
-    r'id': IndexSchema(
-      id: -3268401673993471357,
-      name: r'id',
+    r'card_id_idx': IndexSchema(
+      id: 320930630835636536,
+      name: r'card_id_idx',
       unique: true,
       replace: true,
       properties: [
@@ -83,9 +83,9 @@ const FlashcardCardEntitySchema = CollectionSchema(
         )
       ],
     ),
-    r'deckId': IndexSchema(
-      id: -1182505463565197889,
-      name: r'deckId',
+    r'card_deck_id_idx': IndexSchema(
+      id: -5000949688703415563,
+      name: r'card_deck_id_idx',
       unique: false,
       replace: false,
       properties: [
@@ -96,9 +96,9 @@ const FlashcardCardEntitySchema = CollectionSchema(
         )
       ],
     ),
-    r'uId': IndexSchema(
-      id: -6381944791387401838,
-      name: r'uId',
+    r'card_u_id_idx': IndexSchema(
+      id: -5370178754281379394,
+      name: r'card_u_id_idx',
       unique: false,
       replace: false,
       properties: [
@@ -109,9 +109,9 @@ const FlashcardCardEntitySchema = CollectionSchema(
         )
       ],
     ),
-    r'isDeleted': IndexSchema(
-      id: -786475870904832312,
-      name: r'isDeleted',
+    r'card_is_deleted_idx': IndexSchema(
+      id: 1666092163203608027,
+      name: r'card_is_deleted_idx',
       unique: false,
       replace: false,
       properties: [
@@ -235,56 +235,56 @@ void _flashcardCardEntityAttach(
 
 extension FlashcardCardEntityByIndex on IsarCollection<FlashcardCardEntity> {
   Future<FlashcardCardEntity?> getById(String id) {
-    return getByIndex(r'id', [id]);
+    return getByIndex(r'card_id_idx', [id]);
   }
 
   FlashcardCardEntity? getByIdSync(String id) {
-    return getByIndexSync(r'id', [id]);
+    return getByIndexSync(r'card_id_idx', [id]);
   }
 
   Future<bool> deleteById(String id) {
-    return deleteByIndex(r'id', [id]);
+    return deleteByIndex(r'card_id_idx', [id]);
   }
 
   bool deleteByIdSync(String id) {
-    return deleteByIndexSync(r'id', [id]);
+    return deleteByIndexSync(r'card_id_idx', [id]);
   }
 
   Future<List<FlashcardCardEntity?>> getAllById(List<String> idValues) {
     final values = idValues.map((e) => [e]).toList();
-    return getAllByIndex(r'id', values);
+    return getAllByIndex(r'card_id_idx', values);
   }
 
   List<FlashcardCardEntity?> getAllByIdSync(List<String> idValues) {
     final values = idValues.map((e) => [e]).toList();
-    return getAllByIndexSync(r'id', values);
+    return getAllByIndexSync(r'card_id_idx', values);
   }
 
   Future<int> deleteAllById(List<String> idValues) {
     final values = idValues.map((e) => [e]).toList();
-    return deleteAllByIndex(r'id', values);
+    return deleteAllByIndex(r'card_id_idx', values);
   }
 
   int deleteAllByIdSync(List<String> idValues) {
     final values = idValues.map((e) => [e]).toList();
-    return deleteAllByIndexSync(r'id', values);
+    return deleteAllByIndexSync(r'card_id_idx', values);
   }
 
   Future<Id> putById(FlashcardCardEntity object) {
-    return putByIndex(r'id', object);
+    return putByIndex(r'card_id_idx', object);
   }
 
   Id putByIdSync(FlashcardCardEntity object, {bool saveLinks = true}) {
-    return putByIndexSync(r'id', object, saveLinks: saveLinks);
+    return putByIndexSync(r'card_id_idx', object, saveLinks: saveLinks);
   }
 
   Future<List<Id>> putAllById(List<FlashcardCardEntity> objects) {
-    return putAllByIndex(r'id', objects);
+    return putAllByIndex(r'card_id_idx', objects);
   }
 
   List<Id> putAllByIdSync(List<FlashcardCardEntity> objects,
       {bool saveLinks = true}) {
-    return putAllByIndexSync(r'id', objects, saveLinks: saveLinks);
+    return putAllByIndexSync(r'card_id_idx', objects, saveLinks: saveLinks);
   }
 }
 
@@ -301,7 +301,7 @@ extension FlashcardCardEntityQueryWhereSort
       anyIsDeleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
-        const IndexWhereClause.any(indexName: r'isDeleted'),
+        const IndexWhereClause.any(indexName: r'card_is_deleted_idx'),
       );
     });
   }
@@ -381,7 +381,7 @@ extension FlashcardCardEntityQueryWhere
       idEqualTo(String id) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'id',
+        indexName: r'card_id_idx',
         value: [id],
       ));
     });
@@ -393,13 +393,13 @@ extension FlashcardCardEntityQueryWhere
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'id',
+              indexName: r'card_id_idx',
               lower: [],
               upper: [id],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'id',
+              indexName: r'card_id_idx',
               lower: [id],
               includeLower: false,
               upper: [],
@@ -407,13 +407,13 @@ extension FlashcardCardEntityQueryWhere
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'id',
+              indexName: r'card_id_idx',
               lower: [id],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'id',
+              indexName: r'card_id_idx',
               lower: [],
               upper: [id],
               includeUpper: false,
@@ -426,7 +426,7 @@ extension FlashcardCardEntityQueryWhere
       deckIdEqualTo(String deckId) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'deckId',
+        indexName: r'card_deck_id_idx',
         value: [deckId],
       ));
     });
@@ -438,13 +438,13 @@ extension FlashcardCardEntityQueryWhere
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'deckId',
+              indexName: r'card_deck_id_idx',
               lower: [],
               upper: [deckId],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'deckId',
+              indexName: r'card_deck_id_idx',
               lower: [deckId],
               includeLower: false,
               upper: [],
@@ -452,13 +452,13 @@ extension FlashcardCardEntityQueryWhere
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'deckId',
+              indexName: r'card_deck_id_idx',
               lower: [deckId],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'deckId',
+              indexName: r'card_deck_id_idx',
               lower: [],
               upper: [deckId],
               includeUpper: false,
@@ -471,7 +471,7 @@ extension FlashcardCardEntityQueryWhere
       uIdEqualTo(String uId) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'uId',
+        indexName: r'card_u_id_idx',
         value: [uId],
       ));
     });
@@ -483,13 +483,13 @@ extension FlashcardCardEntityQueryWhere
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uId',
+              indexName: r'card_u_id_idx',
               lower: [],
               upper: [uId],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uId',
+              indexName: r'card_u_id_idx',
               lower: [uId],
               includeLower: false,
               upper: [],
@@ -497,13 +497,13 @@ extension FlashcardCardEntityQueryWhere
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uId',
+              indexName: r'card_u_id_idx',
               lower: [uId],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uId',
+              indexName: r'card_u_id_idx',
               lower: [],
               upper: [uId],
               includeUpper: false,
@@ -516,7 +516,7 @@ extension FlashcardCardEntityQueryWhere
       isDeletedEqualTo(bool isDeleted) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'isDeleted',
+        indexName: r'card_is_deleted_idx',
         value: [isDeleted],
       ));
     });
@@ -528,13 +528,13 @@ extension FlashcardCardEntityQueryWhere
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isDeleted',
+              indexName: r'card_is_deleted_idx',
               lower: [],
               upper: [isDeleted],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isDeleted',
+              indexName: r'card_is_deleted_idx',
               lower: [isDeleted],
               includeLower: false,
               upper: [],
@@ -542,13 +542,13 @@ extension FlashcardCardEntityQueryWhere
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isDeleted',
+              indexName: r'card_is_deleted_idx',
               lower: [isDeleted],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isDeleted',
+              indexName: r'card_is_deleted_idx',
               lower: [],
               upper: [isDeleted],
               includeUpper: false,

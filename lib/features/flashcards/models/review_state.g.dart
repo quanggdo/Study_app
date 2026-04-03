@@ -15,6 +15,10 @@ _$ReviewStateImpl _$$ReviewStateImplFromJson(Map<String, dynamic> json) =>
       reps: (json['reps'] as num?)?.toInt() ?? 0,
       lapses: (json['lapses'] as num?)?.toInt() ?? 0,
       intervalDays: (json['intervalDays'] as num?)?.toInt() ?? 0,
+      intervalMinutes: (json['intervalMinutes'] as num?)?.toInt() ?? 0,
+      stateType:
+          $enumDecodeNullable(_$ReviewStateTypeEnumMap, json['stateType']) ??
+              ReviewStateType.learning,
       easeFactor: (json['easeFactor'] as num?)?.toDouble() ?? 2.5,
       lastReviewedAt: json['lastReviewedAt'] == null
           ? null
@@ -32,8 +36,15 @@ Map<String, dynamic> _$$ReviewStateImplToJson(_$ReviewStateImpl instance) =>
       'reps': instance.reps,
       'lapses': instance.lapses,
       'intervalDays': instance.intervalDays,
+      'intervalMinutes': instance.intervalMinutes,
+      'stateType': _$ReviewStateTypeEnumMap[instance.stateType]!,
       'easeFactor': instance.easeFactor,
       'lastReviewedAt': instance.lastReviewedAt?.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
       'isDeleted': instance.isDeleted,
     };
+
+const _$ReviewStateTypeEnumMap = {
+  ReviewStateType.learning: 'learning',
+  ReviewStateType.review: 'review',
+};

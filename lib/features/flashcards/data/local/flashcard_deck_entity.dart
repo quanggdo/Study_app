@@ -3,6 +3,7 @@ import 'package:isar/isar.dart';
 part 'flashcard_deck_entity.g.dart';
 
 @collection
+@pragma('vm:entry-point')
 class FlashcardDeckEntity {
   FlashcardDeckEntity({
     required this.id,
@@ -21,10 +22,10 @@ class FlashcardDeckEntity {
   Id isarId = Isar.autoIncrement;
 
   /// Domain id (uuid/string) — unique per deck.
-  @Index(unique: true, replace: true)
+  @Index(unique: true, replace: true, name: 'deck_id_idx')
   late String id;
 
-  @Index()
+  @Index(name: 'deck_u_id_idx')
   late String uId;
 
   late String title;
@@ -39,7 +40,6 @@ class FlashcardDeckEntity {
   late DateTime createdAt;
   late DateTime updatedAt;
 
-  @Index()
+  @Index(name: 'deck_is_deleted_idx')
   late bool isDeleted;
 }
-

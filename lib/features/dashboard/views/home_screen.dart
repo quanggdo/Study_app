@@ -116,21 +116,7 @@ class HomeScreen extends ConsumerWidget {
                           letterSpacing: -0.2,
                         ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'Sắp ra mắt',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: colorScheme.onPrimaryContainer,
-                            fontWeight: FontWeight.w700,
-                          ),
-                    ),
-                  ),
+                  // Đã mở Flashcards, nên không hiển thị badge "Sắp ra mắt" toàn cục nữa.
                 ],
               ).animate().fadeIn(delay: 400.ms),
 
@@ -163,6 +149,8 @@ class HomeScreen extends ConsumerWidget {
                   ],
                 ),
                 delay: 450,
+                isAvailable: true,
+                onTap: () => context.push('/flashcards'),
               ),
               _buildFeatureCard(
                 context,
