@@ -14,6 +14,7 @@ import 'package:student_academic_assistant/features/notes_reminders/views/notes_
 import 'package:student_academic_assistant/features/flashcards/views/flashcards_screen.dart';
 import 'package:student_academic_assistant/features/quizzes/views/quiz_screen.dart';
 import 'package:student_academic_assistant/features/quizzes/views/quiz_list_screen.dart';
+import '../../features/pomodoro/views/pomodoro_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   // ValueNotifier to trigger GoRouter refresh on auth state change
@@ -75,6 +76,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile',
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/pomodoro',
+        builder: (context, state) => const PomodoroScreen(),
       ),
       GoRoute(
         path: '/tasks',

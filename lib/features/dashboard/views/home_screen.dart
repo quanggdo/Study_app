@@ -74,7 +74,7 @@ class HomeScreen extends ConsumerWidget {
             tooltip: 'Đăng xuất',
             onPressed: () => _showLogoutDialog(context, ref),
           ),
-          const SizedBox(width: 8),
+          // (Removed debug Pomodoro quick-access button)
         ],
       ),
       body: ResponsiveCenter(
@@ -142,10 +142,10 @@ class HomeScreen extends ConsumerWidget {
                 icon: Icons.quiz_rounded,
                 title: 'Ôn tập & Flashcard',
                 subtitle: 'Quiz thông minh, luyện tập hiệu quả',
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [
-                    const Color(0xFF3949AB),
-                    const Color(0xFF5C6BC0),
+                    Color(0xFF3949AB),
+                    Color(0xFF5C6BC0),
                   ],
                 ),
                 delay: 450,
@@ -157,10 +157,10 @@ class HomeScreen extends ConsumerWidget {
                 icon: Icons.calendar_month_rounded,
                 title: 'Thời khóa biểu (OCR)',
                 subtitle: 'Quét lịch học bằng camera nhanh chóng',
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [
-                    const Color(0xFF00897B),
-                    const Color(0xFF4DB6AC),
+                    Color(0xFF00897B),
+                    Color(0xFF4DB6AC),
                   ],
                 ),
                 delay: 530,
@@ -170,36 +170,83 @@ class HomeScreen extends ConsumerWidget {
                 icon: Icons.mic_rounded,
                 title: 'Ghi chú thông minh',
                 subtitle: 'Ghi chú bằng giọng nói (ASR)',
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [
-                    const Color(0xFF7B1FA2),
-                    const Color(0xFFAB47BC),
+                    Color(0xFF7B1FA2),
+                    Color(0xFFAB47BC),
                   ],
                 ),
                 delay: 610,
               ),
-              _buildFeatureCard(
-                context,
-                icon: Icons.timer_rounded,
-                title: 'Pomodoro Timer',
-                subtitle: 'Tập trung sâu & Deep Work Mode',
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFFE53935),
-                    const Color(0xFFEF5350),
-                  ],
+              // Temporary explicit card to ensure tap/navigation works
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1C1F2E) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark
+                            ? Colors.black.withOpacity(0.20)
+                            : const Color(0xFFE53935).withOpacity(0.08),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () => context.push('/pomodoro'),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        leading: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFE53935), Color(0xFFEF5350)],
+                            ),
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFE53935).withOpacity(0.35),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(Icons.timer_rounded, color: Colors.white, size: 24),
+                        ),
+                        title: const Text('Pomodoro Timer', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5)),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 3),
+                          child: Text('Tập trung sâu & Deep Work Mode', style: TextStyle(fontSize: 12.5, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.55))),
+                        ),
+                        trailing: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE53935).withOpacity(isDark ? 0.20 : 0.10),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFFE53935), size: 14),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                delay: 690,
               ),
               _buildFeatureCard(
                 context,
                 icon: Icons.bar_chart_rounded,
                 title: 'Thống kê & Báo cáo',
                 subtitle: 'Biểu đồ tiến độ học tập theo thời gian',
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [
-                    const Color(0xFFF57C00),
-                    const Color(0xFFFFB74D),
+                    Color(0xFFF57C00),
+                    Color(0xFFFFB74D),
                   ],
                 ),
                 delay: 770,
@@ -376,17 +423,17 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildQuickStats(
       BuildContext context, ColorScheme colorScheme, bool isDark) {
     final stats = [
-      _StatItem(
+      const _StatItem(
           icon: Icons.local_fire_department_rounded,
           label: 'Streak',
           value: '0 ngày',
           color: Colors.orange),
-      _StatItem(
+      const _StatItem(
           icon: Icons.timer_rounded,
           label: 'Đã học',
           value: '0 phút',
-          color: const Color(0xFF3949AB)),
-      _StatItem(
+          color: Color(0xFF3949AB)),
+      const _StatItem(
           icon: Icons.task_alt_rounded,
           label: 'Task',
           value: '0/0',

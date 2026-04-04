@@ -25,6 +25,7 @@ android {
 
         // Required by some dependencies (e.g. flutter_local_notifications)
         isCoreLibraryDesugaringEnabled = true
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -58,4 +59,8 @@ dependencies {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 }

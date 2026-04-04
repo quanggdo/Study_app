@@ -150,7 +150,7 @@ class _NotesRemindersScreenState extends ConsumerState<NotesRemindersScreen>
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<TaskPriority>(
-                    value: priority,
+                    initialValue: priority,
                     decoration: const InputDecoration(labelText: 'Độ ưu tiên'),
                     items: const [
                       DropdownMenuItem(
@@ -354,7 +354,7 @@ class _NotesRemindersScreenState extends ConsumerState<NotesRemindersScreen>
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<TaskPriority>(
-                      value: priority,
+                      initialValue: priority,
                       decoration: const InputDecoration(labelText: 'Độ ưu tiên'),
                       items: const [
                         DropdownMenuItem(
