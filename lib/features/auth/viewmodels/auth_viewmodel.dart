@@ -4,8 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/user_model.dart';
-import '../repositories/auth_repository.dart';
+import 'package:student_academic_assistant/features/auth/models/user_model.dart';
+import 'package:student_academic_assistant/features/auth/repositories/auth_repository.dart';
 
 // =============================================================================
 // Auth Status
@@ -264,3 +264,4 @@ final authStateChangesProvider = StreamProvider<User?>((ref) {
   final repository = ref.watch(authRepositoryProvider);
   return repository.authStateChanges();
 });
+

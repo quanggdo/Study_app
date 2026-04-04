@@ -3,11 +3,11 @@ import 'dart:typed_data';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/constants/firestore_constants.dart';
-import '../../../core/services/firebase_auth_service.dart';
-import '../../../core/services/firebase_firestore_service.dart';
-import '../../../core/services/firebase_storage_service.dart';
-import '../models/user_model.dart';
+import 'package:student_academic_assistant/core/constants/firestore_constants.dart';
+import 'package:student_academic_assistant/core/services/firebase_auth_service.dart';
+import 'package:student_academic_assistant/core/services/firebase_firestore_service.dart';
+import 'package:student_academic_assistant/core/services/firebase_storage_service.dart';
+import 'package:student_academic_assistant/features/auth/models/user_model.dart';
 
 
 final firebaseAuthServiceProvider = Provider<FirebaseAuthService>((ref) {

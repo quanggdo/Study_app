@@ -4,10 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/constants/firestore_constants.dart';
-import '../../../core/services/notification_service.dart';
-import '../models/note_model.dart';
-import '../models/task_model.dart';
+import 'package:student_academic_assistant/core/constants/firestore_constants.dart';
+import 'package:student_academic_assistant/core/services/notification_service.dart';
+import 'package:student_academic_assistant/features/notes_reminders/models/note_model.dart';
+import 'package:student_academic_assistant/features/notes_reminders/models/task_model.dart';
 
 final notesRemindersRepositoryProvider = Provider<NotesRemindersRepository>((ref) {
   return NotesRemindersRepository(

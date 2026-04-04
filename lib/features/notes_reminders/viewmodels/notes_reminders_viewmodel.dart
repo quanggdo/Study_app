@@ -3,10 +3,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/providers/user_provider.dart';
-import '../models/note_model.dart';
-import '../models/task_model.dart';
-import '../repositories/notes_reminders_repository.dart';
+import 'package:student_academic_assistant/core/providers/user_provider.dart';
+import 'package:student_academic_assistant/features/notes_reminders/models/note_model.dart';
+import 'package:student_academic_assistant/features/notes_reminders/models/task_model.dart';
+import 'package:student_academic_assistant/features/notes_reminders/repositories/notes_reminders_repository.dart';
 
 class NotesRemindersState {
   final List<TaskModel> tasks;

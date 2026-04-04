@@ -5,29 +5,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../secret.dart';
 import '../models/class_session_model.dart';
-
-final scheduleAiServiceProvider = Provider<ScheduleAiService>((ref) {
-  return ScheduleAiService();
-});
-
-class ScheduleAiResult {
-  final String rawText;
-  final List<ClassSessionModel> sessions;
-
-  const ScheduleAiResult({
-    required this.rawText,
-    required this.sessions,
-  });
-}
 
 class ScheduleAiService {
   static const String _modelCandidates = 'gemini-2.5-flash';
+  static const String _apiKey = String.fromEnvironment('GEMINI_API_KEY');
   //'
 
   Future<ScheduleAiResult> extractScheduleFromImage(XFile imageFile) async {
-    final String apiKey = GEMINI_API_KEY;
+    final String apiKey = _apiKey;
     if (apiKey.isEmpty) {
       throw Exception(
         'Thiếu GEMINI_API_KEY. Hãy chạy app với --dart-define=GEMINI_API_KEY=... ',
@@ -216,4 +202,18 @@ Chỉ trả về JSON, không dùng markdown.
     }
     return double.tryParse(match.group(1) ?? '');
   }
+}
+
+final scheduleAiServiceProvider = Provider<ScheduleAiService>((ref) {
+  return ScheduleAiService();
+});
+
+class ScheduleAiResult {
+  final String rawText;
+  final List<ClassSessionModel> sessions;
+
+  const ScheduleAiResult({
+    required this.rawText,
+    required this.sessions,
+  });
 }

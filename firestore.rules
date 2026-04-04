@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /quiz/{quizId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Đáp án quiz: chỉ Cloud Functions/Admin SDK được đọc/ghi.
+    match /quiz_answers/{quizId} {
+      allow read, write: if false;
+    }
+
+    // Flashcards preset (read-only)
+    match /flashcards/{fcId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Review progress per-user (flat)
+      match /flashcard_states/{stateId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Quiz attempts per-user
+      match /quiz_attempts/{attemptId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    match /schedules/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.u_id;
+      allow create: if request.auth != null && request.resource.data.u_id == request.auth.uid;
+    }
+
+    match /notes/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.u_id;
+      allow create: if request.auth != null && request.resource.data.u_id == request.auth.uid;
+    }
+
+    match /tasks/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.u_id;
+      allow create: if request.auth != null && request.resource.data.u_id == request.auth.uid;
+    }
+
+    match /user_progress/{docId} {
+      // Người dùng chỉ được đọc tiến độ của chính mình.
+      allow read: if request.auth != null && request.auth.uid == resource.data.u_id;
+
+      // Ghi tiến độ nên do server (Cloud Functions) thực hiện để chống gian lận.
+      // Nếu bạn đang ghi từ app ở các feature khác, hãy tách collection riêng.
+      allow create, update, delete: if false;
+    }
+
+    match /focus_sessions/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.u_id;
+      allow create: if request.auth != null && request.resource.data.u_id == request.auth.uid;
+    }
+  }
+}
