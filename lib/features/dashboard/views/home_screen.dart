@@ -74,18 +74,7 @@ class HomeScreen extends ConsumerWidget {
             tooltip: 'Đăng xuất',
             onPressed: () => _showLogoutDialog(context, ref),
           ),
-          // Debug: quick access to Pomodoro
-          IconButton(
-            tooltip: 'Pomodoro (debug)',
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Navigate to Pomodoro (debug)')),
-              );
-              context.push('/pomodoro');
-            },
-            icon: const Icon(Icons.timer_rounded, size: 18, color: Colors.white),
-          ),
-          const SizedBox(width: 8),
+          // (Removed debug Pomodoro quick-access button)
         ],
       ),
       body: ResponsiveCenter(
