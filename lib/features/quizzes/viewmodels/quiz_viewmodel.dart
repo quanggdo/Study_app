@@ -4,6 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../core/providers/user_provider.dart';
 import '../../auth/repositories/auth_repository.dart';
 import '../../../core/providers/firebase_functions_provider.dart';
 import '../models/quiz_model.dart';
@@ -22,16 +23,18 @@ class QuizSessionState with _$QuizSessionState {
     @Default(false) bool submitting,
     QuizGradingResult? result,
     Object? error,
-
-    /// Countdown (null = không giới hạn thời gian)
     int? remainingSeconds,
     @Default(false) bool timeUp,
+    DateTime? endAt,
   }) = _QuizSessionState;
 }
 
 class QuizSessionViewModel extends StateNotifier<QuizSessionState> {
-  QuizSessionViewModel({required this.repo, required this.quizId})
-      : super(const QuizSessionState()) {
+  QuizSessionViewModel({
+    required this.repo,
+    required this.quizId,
+    required this.ref,
+  }) : super(const QuizSessionState()) {
     _sub = repo.watchQuiz(quizId).listen(
       (q) {
         if (q != null) {
@@ -47,6 +50,7 @@ class QuizSessionViewModel extends StateNotifier<QuizSessionState> {
 
   final QuizRepository repo;
   final String quizId;
+  final Ref ref;
 
   late final StreamSubscription _sub;
 
@@ -58,12 +62,16 @@ class QuizSessionViewModel extends StateNotifier<QuizSessionState> {
 
     final minutes = quiz.timeLimit;
     if (minutes == null || minutes <= 0) {
-      state = state.copyWith(remainingSeconds: null);
+      state = state.copyWith(remainingSeconds: null, endAt: null);
       return;
     }
 
-    var remaining = minutes * 60;
-    state = state.copyWith(remainingSeconds: remaining);
+    final now = DateTime.now();
+    final endAt = state.endAt ?? now.add(Duration(minutes: minutes));
+    state = state.copyWith(
+      endAt: endAt,
+      remainingSeconds: _remainingFromEnd(endAt),
+    );
 
     _timer = Timer.periodic(const Duration(seconds: 1), (t) async {
       // nếu đã có kết quả hoặc đang submit thì thôi
@@ -72,7 +80,7 @@ class QuizSessionViewModel extends StateNotifier<QuizSessionState> {
         return;
       }
 
-      remaining -= 1;
+      final remaining = _remainingFromEnd(state.endAt);
       if (remaining <= 0) {
         t.cancel();
         state = state.copyWith(remainingSeconds: 0, timeUp: true);
@@ -82,6 +90,26 @@ class QuizSessionViewModel extends StateNotifier<QuizSessionState> {
         state = state.copyWith(remainingSeconds: remaining);
       }
     });
+  }
+
+  int _remainingFromEnd(DateTime? endAt) {
+    if (endAt == null) return 0;
+    final diff = endAt.difference(DateTime.now()).inSeconds;
+    return diff < 0 ? 0 : diff;
+  }
+
+  void refreshRemaining() {
+    final endAt = state.endAt;
+    if (endAt == null || state.result != null) return;
+
+    final remaining = _remainingFromEnd(endAt);
+    if (remaining <= 0) {
+      state = state.copyWith(remainingSeconds: 0, timeUp: true);
+      // Force submit when coming back after time is up.
+      unawaited(submit(auto: true));
+    } else {
+      state = state.copyWith(remainingSeconds: remaining);
+    }
   }
 
   @override
@@ -116,6 +144,11 @@ class QuizSessionViewModel extends StateNotifier<QuizSessionState> {
     state = state.copyWith(index: state.index - 1);
   }
 
+  double _score10(int score, int total) {
+    if (total <= 0) return 0;
+    return (score * 10 / total).clamp(0, 10).toDouble();
+  }
+
   Future<void> submit({bool auto = false}) async {
     final quiz = state.quiz;
     if (quiz == null) return;
@@ -130,11 +163,28 @@ class QuizSessionViewModel extends StateNotifier<QuizSessionState> {
 
     state = state.copyWith(submitting: true, error: null);
     try {
+      final attemptId = const Uuid().v4();
       final result = await repo.submitQuiz(
         quizId: quiz.id,
         answers: answers,
-        attemptId: const Uuid().v4(),
+        attemptId: attemptId,
       );
+
+      final user = ref.read(currentUserProvider);
+      if (user != null) {
+        final attempt = QuizAttempt(
+          id: attemptId,
+          quizId: quiz.id,
+          quizTitle: quiz.title,
+          score: result.score,
+          total: result.total,
+          score10: _score10(result.score, result.total),
+          review: result.review,
+          completedAt: result.completedAt ?? DateTime.now(),
+        );
+        await repo.saveAttempt(uid: user.uid, attempt: attempt);
+      }
+
       state = state.copyWith(submitting: false, result: result);
     } catch (e) {
       state = state.copyWith(submitting: false, error: e);
@@ -164,5 +214,21 @@ final quizRepositoryProvider = Provider<QuizRepository>((ref) {
 final quizSessionProvider = StateNotifierProvider.autoDispose
     .family<QuizSessionViewModel, QuizSessionState, String>((ref, quizId) {
   final repo = ref.watch(quizRepositoryProvider);
-  return QuizSessionViewModel(repo: repo, quizId: quizId);
+  return QuizSessionViewModel(repo: repo, quizId: quizId, ref: ref);
+});
+
+final quizHistoryProvider = StreamProvider.family
+    .autoDispose<List<QuizAttempt>, String?>((ref, quizId) {
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return const Stream.empty();
+  final repo = ref.watch(quizRepositoryProvider);
+  return repo.watchQuizHistory(uid: user.uid, quizId: quizId);
+});
+
+final lastQuizAttemptProvider = StreamProvider.family
+    .autoDispose<QuizAttempt?, String?>((ref, quizId) {
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return const Stream.empty();
+  final repo = ref.watch(quizRepositoryProvider);
+  return repo.watchLastAttempt(uid: user.uid, quizId: quizId);
 });

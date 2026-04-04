@@ -644,3 +644,311 @@ abstract class _QuizGradingResult implements QuizGradingResult {
   _$$QuizGradingResultImplCopyWith<_$QuizGradingResultImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
+
+QuizAttempt _$QuizAttemptFromJson(Map<String, dynamic> json) {
+  return _QuizAttempt.fromJson(json);
+}
+
+/// @nodoc
+mixin _$QuizAttempt {
+  String get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'quizId')
+  String get quizId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'quizTitle')
+  String get quizTitle => throw _privateConstructorUsedError;
+  int get score => throw _privateConstructorUsedError;
+  int get total => throw _privateConstructorUsedError;
+  @JsonKey(name: 'score10')
+  double get score10 => throw _privateConstructorUsedError;
+  List<QuizReviewItem> get review => throw _privateConstructorUsedError;
+  DateTime? get completedAt => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $QuizAttemptCopyWith<QuizAttempt> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $QuizAttemptCopyWith<$Res> {
+  factory $QuizAttemptCopyWith(
+          QuizAttempt value, $Res Function(QuizAttempt) then) =
+      _$QuizAttemptCopyWithImpl<$Res, QuizAttempt>;
+  @useResult
+  $Res call(
+      {String id,
+      @JsonKey(name: 'quizId') String quizId,
+      @JsonKey(name: 'quizTitle') String quizTitle,
+      int score,
+      int total,
+      @JsonKey(name: 'score10') double score10,
+      List<QuizReviewItem> review,
+      DateTime? completedAt});
+}
+
+/// @nodoc
+class _$QuizAttemptCopyWithImpl<$Res, $Val extends QuizAttempt>
+    implements $QuizAttemptCopyWith<$Res> {
+  _$QuizAttemptCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? quizId = null,
+    Object? quizTitle = null,
+    Object? score = null,
+    Object? total = null,
+    Object? score10 = null,
+    Object? review = null,
+    Object? completedAt = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      quizId: null == quizId
+          ? _value.quizId
+          : quizId // ignore: cast_nullable_to_non_nullable
+              as String,
+      quizTitle: null == quizTitle
+          ? _value.quizTitle
+          : quizTitle // ignore: cast_nullable_to_non_nullable
+              as String,
+      score: null == score
+          ? _value.score
+          : score // ignore: cast_nullable_to_non_nullable
+              as int,
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+      score10: null == score10
+          ? _value.score10
+          : score10 // ignore: cast_nullable_to_non_nullable
+              as double,
+      review: null == review
+          ? _value.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as List<QuizReviewItem>,
+      completedAt: freezed == completedAt
+          ? _value.completedAt
+          : completedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$QuizAttemptImplCopyWith<$Res>
+    implements $QuizAttemptCopyWith<$Res> {
+  factory _$$QuizAttemptImplCopyWith(
+          _$QuizAttemptImpl value, $Res Function(_$QuizAttemptImpl) then) =
+      __$$QuizAttemptImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      @JsonKey(name: 'quizId') String quizId,
+      @JsonKey(name: 'quizTitle') String quizTitle,
+      int score,
+      int total,
+      @JsonKey(name: 'score10') double score10,
+      List<QuizReviewItem> review,
+      DateTime? completedAt});
+}
+
+/// @nodoc
+class __$$QuizAttemptImplCopyWithImpl<$Res>
+    extends _$QuizAttemptCopyWithImpl<$Res, _$QuizAttemptImpl>
+    implements _$$QuizAttemptImplCopyWith<$Res> {
+  __$$QuizAttemptImplCopyWithImpl(
+      _$QuizAttemptImpl _value, $Res Function(_$QuizAttemptImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? quizId = null,
+    Object? quizTitle = null,
+    Object? score = null,
+    Object? total = null,
+    Object? score10 = null,
+    Object? review = null,
+    Object? completedAt = freezed,
+  }) {
+    return _then(_$QuizAttemptImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      quizId: null == quizId
+          ? _value.quizId
+          : quizId // ignore: cast_nullable_to_non_nullable
+              as String,
+      quizTitle: null == quizTitle
+          ? _value.quizTitle
+          : quizTitle // ignore: cast_nullable_to_non_nullable
+              as String,
+      score: null == score
+          ? _value.score
+          : score // ignore: cast_nullable_to_non_nullable
+              as int,
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+      score10: null == score10
+          ? _value.score10
+          : score10 // ignore: cast_nullable_to_non_nullable
+              as double,
+      review: null == review
+          ? _value._review
+          : review // ignore: cast_nullable_to_non_nullable
+              as List<QuizReviewItem>,
+      completedAt: freezed == completedAt
+          ? _value.completedAt
+          : completedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$QuizAttemptImpl implements _QuizAttempt {
+  const _$QuizAttemptImpl(
+      {required this.id,
+      @JsonKey(name: 'quizId') required this.quizId,
+      @JsonKey(name: 'quizTitle') required this.quizTitle,
+      required this.score,
+      required this.total,
+      @JsonKey(name: 'score10') required this.score10,
+      final List<QuizReviewItem> review = const <QuizReviewItem>[],
+      this.completedAt})
+      : _review = review;
+
+  factory _$QuizAttemptImpl.fromJson(Map<String, dynamic> json) =>
+      _$$QuizAttemptImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  @JsonKey(name: 'quizId')
+  final String quizId;
+  @override
+  @JsonKey(name: 'quizTitle')
+  final String quizTitle;
+  @override
+  final int score;
+  @override
+  final int total;
+  @override
+  @JsonKey(name: 'score10')
+  final double score10;
+  final List<QuizReviewItem> _review;
+  @override
+  @JsonKey()
+  List<QuizReviewItem> get review {
+    if (_review is EqualUnmodifiableListView) return _review;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_review);
+  }
+
+  @override
+  final DateTime? completedAt;
+
+  @override
+  String toString() {
+    return 'QuizAttempt(id: $id, quizId: $quizId, quizTitle: $quizTitle, score: $score, total: $total, score10: $score10, review: $review, completedAt: $completedAt)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$QuizAttemptImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.quizId, quizId) || other.quizId == quizId) &&
+            (identical(other.quizTitle, quizTitle) ||
+                other.quizTitle == quizTitle) &&
+            (identical(other.score, score) || other.score == score) &&
+            (identical(other.total, total) || other.total == total) &&
+            (identical(other.score10, score10) || other.score10 == score10) &&
+            const DeepCollectionEquality().equals(other._review, _review) &&
+            (identical(other.completedAt, completedAt) ||
+                other.completedAt == completedAt));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      quizId,
+      quizTitle,
+      score,
+      total,
+      score10,
+      const DeepCollectionEquality().hash(_review),
+      completedAt);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$QuizAttemptImplCopyWith<_$QuizAttemptImpl> get copyWith =>
+      __$$QuizAttemptImplCopyWithImpl<_$QuizAttemptImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$QuizAttemptImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _QuizAttempt implements QuizAttempt {
+  const factory _QuizAttempt(
+      {required final String id,
+      @JsonKey(name: 'quizId') required final String quizId,
+      @JsonKey(name: 'quizTitle') required final String quizTitle,
+      required final int score,
+      required final int total,
+      @JsonKey(name: 'score10') required final double score10,
+      final List<QuizReviewItem> review,
+      final DateTime? completedAt}) = _$QuizAttemptImpl;
+
+  factory _QuizAttempt.fromJson(Map<String, dynamic> json) =
+      _$QuizAttemptImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  @JsonKey(name: 'quizId')
+  String get quizId;
+  @override
+  @JsonKey(name: 'quizTitle')
+  String get quizTitle;
+  @override
+  int get score;
+  @override
+  int get total;
+  @override
+  @JsonKey(name: 'score10')
+  double get score10;
+  @override
+  List<QuizReviewItem> get review;
+  @override
+  DateTime? get completedAt;
+  @override
+  @JsonKey(ignore: true)
+  _$$QuizAttemptImplCopyWith<_$QuizAttemptImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}

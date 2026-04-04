@@ -62,3 +62,32 @@ Map<String, dynamic> _$$QuizGradingResultImplToJson(
       'review': instance.review,
       'completedAt': instance.completedAt?.toIso8601String(),
     };
+
+_$QuizAttemptImpl _$$QuizAttemptImplFromJson(Map<String, dynamic> json) =>
+    _$QuizAttemptImpl(
+      id: json['id'] as String,
+      quizId: json['quizId'] as String,
+      quizTitle: json['quizTitle'] as String,
+      score: (json['score'] as num).toInt(),
+      total: (json['total'] as num).toInt(),
+      score10: (json['score10'] as num).toDouble(),
+      review: (json['review'] as List<dynamic>?)
+              ?.map((e) => QuizReviewItem.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <QuizReviewItem>[],
+      completedAt: json['completedAt'] == null
+          ? null
+          : DateTime.parse(json['completedAt'] as String),
+    );
+
+Map<String, dynamic> _$$QuizAttemptImplToJson(_$QuizAttemptImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'quizId': instance.quizId,
+      'quizTitle': instance.quizTitle,
+      'score': instance.score,
+      'total': instance.total,
+      'score10': instance.score10,
+      'review': instance.review,
+      'completedAt': instance.completedAt?.toIso8601String(),
+    };

@@ -8,4 +8,5 @@ class FirestoreConstants {
   static const String flashcards = 'flashcards';
   static const String userProgress = 'user_progress';
   static const String focusSessions = 'focus_sessions';
+  static const String quizAttempts = 'quiz_attempts';
 }

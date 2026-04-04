@@ -23,10 +23,9 @@ mixin _$QuizSessionState {
   bool get submitting => throw _privateConstructorUsedError;
   QuizGradingResult? get result => throw _privateConstructorUsedError;
   Object? get error => throw _privateConstructorUsedError;
-
-  /// Countdown (null = không giới hạn thời gian)
   int? get remainingSeconds => throw _privateConstructorUsedError;
   bool get timeUp => throw _privateConstructorUsedError;
+  DateTime? get endAt => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $QuizSessionStateCopyWith<QuizSessionState> get copyWith =>
@@ -48,7 +47,8 @@ abstract class $QuizSessionStateCopyWith<$Res> {
       QuizGradingResult? result,
       Object? error,
       int? remainingSeconds,
-      bool timeUp});
+      bool timeUp,
+      DateTime? endAt});
 
   $QuizCopyWith<$Res>? get quiz;
   $QuizGradingResultCopyWith<$Res>? get result;
@@ -76,6 +76,7 @@ class _$QuizSessionStateCopyWithImpl<$Res, $Val extends QuizSessionState>
     Object? error = freezed,
     Object? remainingSeconds = freezed,
     Object? timeUp = null,
+    Object? endAt = freezed,
   }) {
     return _then(_value.copyWith(
       loading: null == loading
@@ -111,6 +112,10 @@ class _$QuizSessionStateCopyWithImpl<$Res, $Val extends QuizSessionState>
           ? _value.timeUp
           : timeUp // ignore: cast_nullable_to_non_nullable
               as bool,
+      endAt: freezed == endAt
+          ? _value.endAt
+          : endAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 
@@ -156,7 +161,8 @@ abstract class _$$QuizSessionStateImplCopyWith<$Res>
       QuizGradingResult? result,
       Object? error,
       int? remainingSeconds,
-      bool timeUp});
+      bool timeUp,
+      DateTime? endAt});
 
   @override
   $QuizCopyWith<$Res>? get quiz;
@@ -184,6 +190,7 @@ class __$$QuizSessionStateImplCopyWithImpl<$Res>
     Object? error = freezed,
     Object? remainingSeconds = freezed,
     Object? timeUp = null,
+    Object? endAt = freezed,
   }) {
     return _then(_$QuizSessionStateImpl(
       loading: null == loading
@@ -219,6 +226,10 @@ class __$$QuizSessionStateImplCopyWithImpl<$Res>
           ? _value.timeUp
           : timeUp // ignore: cast_nullable_to_non_nullable
               as bool,
+      endAt: freezed == endAt
+          ? _value.endAt
+          : endAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -235,7 +246,8 @@ class _$QuizSessionStateImpl implements _QuizSessionState {
       this.result,
       this.error,
       this.remainingSeconds,
-      this.timeUp = false})
+      this.timeUp = false,
+      this.endAt})
       : _answersByQId = answersByQId;
 
   @override
@@ -262,17 +274,17 @@ class _$QuizSessionStateImpl implements _QuizSessionState {
   final QuizGradingResult? result;
   @override
   final Object? error;
-
-  /// Countdown (null = không giới hạn thời gian)
   @override
   final int? remainingSeconds;
   @override
   @JsonKey()
   final bool timeUp;
+  @override
+  final DateTime? endAt;
 
   @override
   String toString() {
-    return 'QuizSessionState(loading: $loading, quiz: $quiz, index: $index, answersByQId: $answersByQId, submitting: $submitting, result: $result, error: $error, remainingSeconds: $remainingSeconds, timeUp: $timeUp)';
+    return 'QuizSessionState(loading: $loading, quiz: $quiz, index: $index, answersByQId: $answersByQId, submitting: $submitting, result: $result, error: $error, remainingSeconds: $remainingSeconds, timeUp: $timeUp, endAt: $endAt)';
   }
 
   @override
@@ -291,7 +303,8 @@ class _$QuizSessionStateImpl implements _QuizSessionState {
             const DeepCollectionEquality().equals(other.error, error) &&
             (identical(other.remainingSeconds, remainingSeconds) ||
                 other.remainingSeconds == remainingSeconds) &&
-            (identical(other.timeUp, timeUp) || other.timeUp == timeUp));
+            (identical(other.timeUp, timeUp) || other.timeUp == timeUp) &&
+            (identical(other.endAt, endAt) || other.endAt == endAt));
   }
 
   @override
@@ -305,7 +318,8 @@ class _$QuizSessionStateImpl implements _QuizSessionState {
       result,
       const DeepCollectionEquality().hash(error),
       remainingSeconds,
-      timeUp);
+      timeUp,
+      endAt);
 
   @JsonKey(ignore: true)
   @override
@@ -325,7 +339,8 @@ abstract class _QuizSessionState implements QuizSessionState {
       final QuizGradingResult? result,
       final Object? error,
       final int? remainingSeconds,
-      final bool timeUp}) = _$QuizSessionStateImpl;
+      final bool timeUp,
+      final DateTime? endAt}) = _$QuizSessionStateImpl;
 
   @override
   bool get loading;
@@ -342,11 +357,11 @@ abstract class _QuizSessionState implements QuizSessionState {
   @override
   Object? get error;
   @override
-
-  /// Countdown (null = không giới hạn thời gian)
   int? get remainingSeconds;
   @override
   bool get timeUp;
+  @override
+  DateTime? get endAt;
   @override
   @JsonKey(ignore: true)
   _$$QuizSessionStateImplCopyWith<_$QuizSessionStateImpl> get copyWith =>

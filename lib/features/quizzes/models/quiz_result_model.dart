@@ -40,3 +40,20 @@ class QuizGradingResult with _$QuizGradingResult {
   factory QuizGradingResult.fromJson(Map<String, Object?> json) =>
       _$QuizGradingResultFromJson(json);
 }
+
+@freezed
+class QuizAttempt with _$QuizAttempt {
+  const factory QuizAttempt({
+    required String id,
+    @JsonKey(name: 'quizId') required String quizId,
+    @JsonKey(name: 'quizTitle') required String quizTitle,
+    required int score,
+    required int total,
+    @JsonKey(name: 'score10') required double score10,
+    @Default(<QuizReviewItem>[]) List<QuizReviewItem> review,
+    DateTime? completedAt,
+  }) = _QuizAttempt;
+
+  factory QuizAttempt.fromJson(Map<String, Object?> json) =>
+      _$QuizAttemptFromJson(json);
+}

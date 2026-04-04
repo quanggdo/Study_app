@@ -25,6 +25,11 @@ service cloud.firestore {
       match /flashcard_states/{stateId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      // Quiz attempts per-user
+      match /quiz_attempts/{attemptId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     match /schedules/{docId} {
