@@ -4,10 +4,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../auth/viewmodels/auth_viewmodel.dart';
 import '../models/due_card.dart';
+import '../models/flashcard_card.dart';
 import '../models/review_state.dart';
 import '../repositories/isar_flashcard_repository.dart';
 import '../repositories/flashcard_repository_contract.dart';
 import '../services/sm2.dart';
+
+class ReviewSessionParams {
+  const ReviewSessionParams({
+    required this.deckId,
+    required this.includeAllCards,
+  });
+
+  final String deckId;
+  final bool includeAllCards;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ReviewSessionParams &&
+        other.deckId == deckId &&
+        other.includeAllCards == includeAllCards;
+  }
+
+  @override
+  int get hashCode => Object.hash(deckId, includeAllCards);
+}
 
 enum ReviewGrade { again, hard, good, easy }
 
@@ -32,6 +54,9 @@ class ReviewSessionState {
     this.error,
     this.items = const [],
     this.index = 0,
+    this.initialTotal = 0,
+    this.repeatedCount = 0,
+    this.reviewedCount = 0,
     this.showAnswer = false,
     this.lastScheduledMessage,
   });
@@ -40,18 +65,24 @@ class ReviewSessionState {
   final Object? error;
   final List<DueCard> items;
   final int index;
+  final int initialTotal;
+  final int repeatedCount;
+  final int reviewedCount;
   final bool showAnswer;
   final String? lastScheduledMessage;
 
   DueCard? get current => index >= 0 && index < items.length ? items[index] : null;
-  int get total => items.length;
-  int get remaining => max(0, items.length - index);
+  int get total => initialTotal + repeatedCount;
+  int get remaining => items.length;
 
   ReviewSessionState copyWith({
     bool? loading,
     Object? error,
     List<DueCard>? items,
     int? index,
+    int? initialTotal,
+    int? repeatedCount,
+    int? reviewedCount,
     bool? showAnswer,
     String? lastScheduledMessage,
   }) {
@@ -60,6 +91,9 @@ class ReviewSessionState {
       error: error,
       items: items ?? this.items,
       index: index ?? this.index,
+      initialTotal: initialTotal ?? this.initialTotal,
+      repeatedCount: repeatedCount ?? this.repeatedCount,
+      reviewedCount: reviewedCount ?? this.reviewedCount,
       showAnswer: showAnswer ?? this.showAnswer,
       lastScheduledMessage: lastScheduledMessage,
     );
@@ -71,7 +105,8 @@ class ReviewSessionViewModel extends StateNotifier<ReviewSessionState> {
     required this.repo,
     required this.uId,
     required this.deckId,
-    int limit = 20,
+    required this.includeAllCards,
+    int limit = 1000,
   })  : _limit = limit,
         super(const ReviewSessionState()) {
     load();
@@ -80,22 +115,42 @@ class ReviewSessionViewModel extends StateNotifier<ReviewSessionState> {
   final FlashcardRepository repo;
   final String uId;
   final String deckId;
+  final bool includeAllCards;
   final int _limit;
 
   Future<void> load() async {
     state = state.copyWith(loading: true, error: null, lastScheduledMessage: null);
     try {
-      final items = await repo.getDueCards(
-        uId: uId,
-        deckId: deckId,
-        now: DateTime.now(),
-        limit: _limit,
-      );
+      final now = DateTime.now();
+
+      final List<DueCard> items;
+      if (includeAllCards) {
+        final cards = await repo.watchCards(uId: uId, deckId: deckId).first;
+        items = await Future.wait(cards.map((FlashcardCard card) async {
+          final state = await repo.getOrCreateReviewState(
+            uId: uId,
+            deckId: deckId,
+            cardId: card.id,
+            now: now,
+          );
+          return DueCard(card: card, state: state);
+        }));
+      } else {
+        items = await repo.getDueCards(
+          uId: uId,
+          deckId: deckId,
+          now: now,
+          limit: _limit,
+        );
+      }
 
       state = state.copyWith(
         loading: false,
         items: items,
         index: 0,
+        initialTotal: items.length,
+        repeatedCount: 0,
+        reviewedCount: 0,
         showAnswer: false,
       );
     } catch (e) {
@@ -168,11 +223,20 @@ class ReviewSessionViewModel extends StateNotifier<ReviewSessionState> {
     final updated = [...state.items];
     updated.removeAt(state.index);
 
-    final newIndex = min(state.index, max(0, updated.length));
+    var repeatedCount = state.repeatedCount;
+    if (grade == ReviewGrade.again) {
+      // Đưa thẻ xuống cuối phiên để người dùng thấy tác dụng của Again ngay.
+      updated.add(DueCard(card: current.card, state: next));
+      repeatedCount += 1;
+    }
+
+    final newIndex = updated.isEmpty ? 0 : min(state.index, updated.length - 1);
 
     state = state.copyWith(
       items: updated,
       index: newIndex,
+      repeatedCount: repeatedCount,
+      reviewedCount: state.reviewedCount + 1,
       showAnswer: false,
       lastScheduledMessage: _formatScheduleMessage(now: now, next: next, grade: grade),
     );
@@ -203,7 +267,7 @@ class ReviewSessionViewModel extends StateNotifier<ReviewSessionState> {
 }
 
 final reviewSessionProvider = StateNotifierProvider.autoDispose
-    .family<ReviewSessionViewModel, ReviewSessionState, String>((ref, deckId) {
+    .family<ReviewSessionViewModel, ReviewSessionState, ReviewSessionParams>((ref, params) {
   final auth = ref.watch(authNotifierProvider);
   final uId = auth.user?.uid;
   if (uId == null) {
@@ -214,6 +278,7 @@ final reviewSessionProvider = StateNotifierProvider.autoDispose
   return ReviewSessionViewModel(
     repo: repo,
     uId: uId,
-    deckId: deckId,
+    deckId: params.deckId,
+    includeAllCards: params.includeAllCards,
   );
 });

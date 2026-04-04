@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:student_academic_assistant/core/providers/theme_mode_provider.dart';
 import 'package:student_academic_assistant/core/providers/user_provider.dart';
 import 'package:student_academic_assistant/core/theme/app_theme.dart';
 import 'package:student_academic_assistant/core/widgets/responsive_center.dart';
@@ -56,6 +57,14 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          _AppBarButton(
+            icon: isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+            tooltip: isDark ? 'Chuyển giao diện sáng' : 'Chuyển giao diện tối',
+            onPressed: () {
+              ref.read(themeModeProvider.notifier).state =
+                  isDark ? ThemeMode.light : ThemeMode.dark;
+            },
+          ),
           // Profile
           _AppBarButton(
             icon: Icons.person_rounded,
@@ -164,6 +173,8 @@ class HomeScreen extends ConsumerWidget {
                   ],
                 ),
                 delay: 530,
+                isAvailable: true,
+                onTap: () => context.push('/schedule'),
               ),
               _buildFeatureCard(
                 context,
@@ -266,13 +277,7 @@ class HomeScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         gradient: AppTheme.primaryGradient,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF3949AB).withOpacity(0.35),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        border: Border.all(color: Colors.white.withOpacity(0.12), width: 1),
       ),
       child: Stack(
         clipBehavior: Clip.none,
@@ -286,7 +291,7 @@ class HomeScreen extends ConsumerWidget {
               height: 90,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.07),
+                color: Colors.white.withOpacity(0.03),
               ),
             ),
           ),
@@ -298,7 +303,7 @@ class HomeScreen extends ConsumerWidget {
               height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.white.withOpacity(0.02),
               ),
             ),
           ),
@@ -440,61 +445,71 @@ class HomeScreen extends ConsumerWidget {
           color: Colors.green),
     ];
 
-    return Row(
-      children: stats.asMap().entries.map((entry) {
-        final stat = entry.value;
-        final delay = 350 + entry.key * 80;
-        return Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(right: entry.key < stats.length - 1 ? 10 : 0),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1C1F2E) : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: isDark
-                        ? Colors.black.withOpacity(0.25)
-                        : const Color(0xFF3949AB).withOpacity(0.06),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: stat.color.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool compact = constraints.maxWidth < 520;
+
+        return Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: stats.asMap().entries.map((entry) {
+            final stat = entry.value;
+            final delay = 350 + entry.key * 80;
+            final double cardWidth = compact
+                ? (constraints.maxWidth - 10) / 2
+                : (constraints.maxWidth - 20) / 3;
+
+            return SizedBox(
+              width: cardWidth,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1C1F2E) : Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark
+                          ? Colors.black.withOpacity(0.25)
+                          : const Color(0xFF3949AB).withOpacity(0.06),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     ),
-                    child: Icon(stat.icon, color: stat.color, size: 18),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    stat.value,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.2,
-                        ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    stat.label,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                  ),
-                ],
-              ),
-            ).animate().fadeIn(delay: Duration(milliseconds: delay)).slideY(begin: 0.06),
-          ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: stat.color.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(stat.icon, color: stat.color, size: 18),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      stat.value,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.2,
+                          ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      stat.label,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
+                ),
+              ).animate().fadeIn(delay: Duration(milliseconds: delay)).slideY(begin: 0.06),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 

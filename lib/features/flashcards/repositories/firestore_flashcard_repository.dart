@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:uuid/uuid.dart';
-
 import '../../../core/services/firebase_firestore_service.dart';
 import '../models/due_card.dart';
 import '../models/flashcard_card.dart';
@@ -64,30 +62,52 @@ class FirestoreFlashcardRepository implements FlashcardRepository {
 
     final nowIso = DateTime.now().toIso8601String();
 
-    return cardsRaw
-        .whereType<Map>()
-        .map((m) => m.map((k, v) => MapEntry(k.toString(), v)))
-        .map((m) {
-          final id = (m['id'] as String?) ?? const Uuid().v4();
-          final front = (m['front'] as String?) ?? (m['forehead'] as String?) ?? '';
-          final back = (m['back'] as String?) ?? '';
-          final hint = (m['hint'] as String?);
+    return cardsRaw.asMap().entries.map((entry) {
+      final index = entry.key;
+      final dynamic item = entry.value;
+      final m = (item is Map)
+          ? item.map((k, v) => MapEntry(k.toString(), v))
+          : const <String, dynamic>{};
 
-          return FlashcardCard.fromJson(<String, Object?>{
-            'id': id,
-            'deckId': deckId,
-            // Read-only public deck -> uId rỗng
-            'uId': (raw['uId'] as String?) ?? '',
-            'front': front,
-            'back': back,
-            'hint': hint,
-            'createdAt': nowIso,
-            'updatedAt': nowIso,
-            'isDeleted': false,
-          });
-        })
-        .where((c) => c.front.trim().isNotEmpty && c.back.trim().isNotEmpty)
-        .toList();
+      // ID phải ổn định theo dữ liệu gốc để trạng thái due không bị mất.
+      final rawId = (m['id'] ?? m['card_id'] ?? m['cardId'] ?? '').toString().trim();
+      final id = rawId.isNotEmpty ? rawId : '${deckId}_$index';
+
+      final rawFront = (
+        m['front'] ??
+        m['forehead'] ??
+        m['question'] ??
+        m['term'] ??
+        m['title'] ??
+        ''
+      ).toString().trim();
+
+      final rawBack = (
+        m['back'] ??
+        m['answer'] ??
+        m['definition'] ??
+        m['content'] ??
+        m['explanation'] ??
+        ''
+      ).toString().trim();
+
+      final front = rawFront.isNotEmpty ? rawFront : 'Thẻ ${index + 1}';
+      final back = rawBack.isNotEmpty ? rawBack : '(Chưa có nội dung)';
+      final hint = (m['hint'] ?? m['note'])?.toString();
+
+      return FlashcardCard.fromJson(<String, Object?>{
+        'id': id,
+        'deckId': deckId,
+        // Read-only public deck -> uId rỗng
+        'uId': (raw['uId'] as String?) ?? '',
+        'front': front,
+        'back': back,
+        'hint': hint,
+        'createdAt': nowIso,
+        'updatedAt': nowIso,
+        'isDeleted': false,
+      });
+    }).toList();
   }
 
   ReviewState _stateFromDoc(

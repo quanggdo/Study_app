@@ -164,8 +164,9 @@ class QuizAttemptReviewScreen extends ConsumerWidget {
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
                     itemBuilder: (context, i) {
                       final item = review[i];
-                      final q = byId[item.qId];
-                      final qTitle = q?.question ?? 'Câu ${i + 1} • ${item.qId}';
+                      final q = byId[item.qId] ?? (i < questions.length ? questions[i] : null);
+                      final qRaw = (q?.question ?? '').toString().trim();
+                      final qTitle = qRaw.isNotEmpty ? qRaw : 'Câu ${i + 1} • ${item.qId}';
                       final choices = q?.choices ?? const [];
 
                       return Card(

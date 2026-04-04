@@ -13,6 +13,37 @@ class DeckDetailScreen extends ConsumerWidget {
 
   final FlashcardDeck deck;
 
+  Future<bool?> _showReviewModePicker(BuildContext context) {
+    return showModalBottomSheet<bool>(
+      context: context,
+      showDragHandle: true,
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.schedule_rounded),
+                  title: const Text('Ôn thẻ đến hạn'),
+                  subtitle: const Text('Chỉ học các thẻ đến hạn theo lịch SM2'),
+                  onTap: () => Navigator.pop(ctx, false),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.library_books_rounded),
+                  title: const Text('Ôn tất cả thẻ'),
+                  subtitle: const Text('Luyện toàn bộ thẻ trong bộ hiện tại'),
+                  onTap: () => Navigator.pop(ctx, true),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cardsAsync = ref.watch(flashcardCardsProvider(deck.id));
@@ -24,12 +55,16 @@ class DeckDetailScreen extends ConsumerWidget {
           IconButton(
             tooltip: 'Ôn tập',
             icon: const Icon(Icons.play_circle_fill_rounded),
-            onPressed: () {
+            onPressed: () async {
+              final includeAll = await _showReviewModePicker(context);
+              if (includeAll == null || !context.mounted) return;
+
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => ReviewSessionScreen(
                     deckId: deck.id,
                     deckTitle: deck.title,
+                    includeAllCards: includeAll,
                   ),
                 ),
               );
