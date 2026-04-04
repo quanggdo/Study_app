@@ -3,10 +3,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/theme/app_theme.dart';
-import '../../../core/utils/validators.dart';
-import '../../../core/widgets/responsive_center.dart';
-import '../viewmodels/auth_viewmodel.dart';
+import 'package:student_academic_assistant/core/theme/app_theme.dart';
+import 'package:student_academic_assistant/core/utils/validators.dart';
+import 'package:student_academic_assistant/core/widgets/responsive_center.dart';
+import 'package:student_academic_assistant/features/auth/viewmodels/auth_viewmodel.dart';
+
 import 'widgets/auth_header.dart';
 import 'widgets/auth_text_field.dart';
 
@@ -242,11 +243,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(height: 24),
 
                         // Register link
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 4,
                           children: [
                             Text(
-                              'Chưa có tài khoản? ',
+                              'Chưa có tài khoản?',
                               style: TextStyle(
                                   color: colorScheme.onSurfaceVariant),
                             ),

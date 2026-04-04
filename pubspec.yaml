@@ -10,6 +10,11 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  flutter_animate: ^4.5.0
+
+  # Serialization annotations (required by json_serializable/freezed)
+  json_annotation: ^4.9.0
+  freezed_annotation: ^2.4.1
 
   # State Management
   flutter_riverpod: ^2.5.1
@@ -51,7 +56,6 @@ dependencies:
 
   # UI / UX / Charts
   fl_chart: ^0.68.0
-  flutter_animate: ^4.5.0
   lottie: ^3.1.2
   vibration: ^3.1.8
   sensors_plus: ^7.0.0
@@ -79,12 +83,12 @@ dev_dependencies:
   riverpod_generator: ^2.3.9
   json_serializable: ^6.8.0
   freezed: ^2.4.7
-  freezed_annotation: ^2.4.1
   isar_generator: ^3.1.0+1
 
 dependency_overrides:
   js: ^0.6.7
-
+  isar_flutter_libs:
+    path: third_party/isar_flutter_libs
 
 flutter:
   uses-material-design: true

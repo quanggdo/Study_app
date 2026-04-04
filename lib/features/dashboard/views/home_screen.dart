@@ -3,10 +3,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/providers/user_provider.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/responsive_center.dart';
-import '../../auth/viewmodels/auth_viewmodel.dart';
+import 'package:student_academic_assistant/core/providers/user_provider.dart';
+import 'package:student_academic_assistant/core/theme/app_theme.dart';
+import 'package:student_academic_assistant/core/widgets/responsive_center.dart';
+import 'package:student_academic_assistant/features/auth/viewmodels/auth_viewmodel.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -116,21 +116,7 @@ class HomeScreen extends ConsumerWidget {
                           letterSpacing: -0.2,
                         ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'Sắp ra mắt',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: colorScheme.onPrimaryContainer,
-                            fontWeight: FontWeight.w700,
-                          ),
-                    ),
-                  ),
+                  // Đã mở Flashcards, nên không hiển thị badge "Sắp ra mắt" toàn cục nữa.
                 ],
               ).animate().fadeIn(delay: 400.ms),
 
@@ -163,6 +149,8 @@ class HomeScreen extends ConsumerWidget {
                   ],
                 ),
                 delay: 450,
+                isAvailable: true,
+                onTap: () => context.push('/study'),
               ),
               _buildFeatureCard(
                 context,
@@ -176,8 +164,6 @@ class HomeScreen extends ConsumerWidget {
                   ],
                 ),
                 delay: 530,
-                isAvailable: true,
-                onTap: () => context.push('/timetable'),
               ),
               _buildFeatureCard(
                 context,

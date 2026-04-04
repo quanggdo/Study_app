@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-import '../../firebase_options.dart';
+import 'package:student_academic_assistant/firebase_options.dart';
 
 class FirebaseAuthService {
   final FirebaseAuth _auth;

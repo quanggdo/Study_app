@@ -6,8 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../core/providers/user_provider.dart';
-import '../viewmodels/auth_viewmodel.dart';
+import 'package:student_academic_assistant/core/providers/user_provider.dart';
+import 'package:student_academic_assistant/features/auth/viewmodels/auth_viewmodel.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -350,147 +350,147 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
                   child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Section: Personal Info
-                    _buildSectionTitle(context, 'Thông tin cá nhân',
-                        Icons.person_outline_rounded),
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Section: Personal Info
+                        _buildSectionTitle(context, 'Thông tin cá nhân',
+                            Icons.person_outline_rounded),
 
-                    const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                    // Display Name
-                    _buildTextField(
-                      controller: _nameController,
-                      label: 'Họ và tên',
-                      icon: Icons.badge_rounded,
-                      onChanged: (_) => _markChanged(),
-                      validator: (val) {
-                        if (val == null || val.trim().isEmpty) {
-                          return 'Vui lòng nhập họ và tên';
-                        }
-                        if (val.trim().length < 2) {
-                          return 'Tên phải có ít nhất 2 ký tự';
-                        }
-                        return null;
-                      },
-                    ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.05),
+                        // Display Name
+                        _buildTextField(
+                          controller: _nameController,
+                          label: 'Họ và tên',
+                          icon: Icons.badge_rounded,
+                          onChanged: (_) => _markChanged(),
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) {
+                              return 'Vui lòng nhập họ và tên';
+                            }
+                            if (val.trim().length < 2) {
+                              return 'Tên phải có ít nhất 2 ký tự';
+                            }
+                            return null;
+                          },
+                        ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.05),
 
-                    const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                    // Email (read-only)
-                    _buildTextField(
-                      initialValue: user.email,
-                      label: 'Email',
-                      icon: Icons.email_rounded,
-                      readOnly: true,
-                      helperText: 'Email không thể thay đổi',
-                    ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.05),
+                        // Email (read-only)
+                        _buildTextField(
+                          initialValue: user.email,
+                          label: 'Email',
+                          icon: Icons.email_rounded,
+                          readOnly: true,
+                          helperText: 'Email không thể thay đổi',
+                        ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.05),
 
-                    const SizedBox(height: 32),
+                        const SizedBox(height: 32),
 
-                    // Section: Study Preferences
-                    _buildSectionTitle(
-                        context, 'Cài đặt học tập', Icons.school_rounded),
+                        // Section: Study Preferences
+                        _buildSectionTitle(
+                            context, 'Cài đặt học tập', Icons.school_rounded),
 
-                    const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                    // Target Study Time
-                    _buildTextField(
-                      controller: _studyTimeController,
-                      label: 'Thời gian học mục tiêu (phút/ngày)',
-                      icon: Icons.timer_rounded,
-                      keyboardType: TextInputType.number,
-                      onChanged: (_) => _markChanged(),
-                      helperText:
-                          'Mặc định: 120 phút. Đặt mục tiêu phù hợp với bạn.',
-                      validator: (val) {
-                        if (val == null || val.trim().isEmpty) {
-                          return 'Vui lòng nhập thời gian';
-                        }
-                        final minutes = int.tryParse(val.trim());
-                        if (minutes == null || minutes < 10 || minutes > 720) {
-                          return 'Thời gian phải từ 10 đến 720 phút';
-                        }
-                        return null;
-                      },
-                    ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.05),
+                        // Target Study Time
+                        _buildTextField(
+                          controller: _studyTimeController,
+                          label: 'Thời gian học mục tiêu (phút/ngày)',
+                          icon: Icons.timer_rounded,
+                          keyboardType: TextInputType.number,
+                          onChanged: (_) => _markChanged(),
+                          helperText:
+                              'Mặc định: 120 phút. Đặt mục tiêu phù hợp với bạn.',
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) {
+                              return 'Vui lòng nhập thời gian';
+                            }
+                            final minutes = int.tryParse(val.trim());
+                            if (minutes == null || minutes < 10 || minutes > 720) {
+                              return 'Thời gian phải từ 10 đến 720 phút';
+                            }
+                            return null;
+                          },
+                        ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.05),
 
-                    const SizedBox(height: 32),
+                        const SizedBox(height: 32),
 
-                    // Section: Account actions
-                    _buildSectionTitle(
-                        context, 'Tài khoản', Icons.settings_rounded),
+                        // Section: Account actions
+                        _buildSectionTitle(
+                            context, 'Tài khoản', Icons.settings_rounded),
 
-                    const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                    // Change Password
-                    _buildActionTile(
-                      context,
-                      icon: Icons.lock_outline_rounded,
-                      title: 'Đổi mật khẩu',
-                      subtitle: 'Cập nhật mật khẩu bảo mật',
-                      onTap: () => context.push('/change-password'),
-                      color: colorScheme.primaryContainer,
-                      iconColor: colorScheme.onPrimaryContainer,
-                    ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.05),
+                        // Change Password
+                        _buildActionTile(
+                          context,
+                          icon: Icons.lock_outline_rounded,
+                          title: 'Đổi mật khẩu',
+                          subtitle: 'Cập nhật mật khẩu bảo mật',
+                          onTap: () => context.push('/change-password'),
+                          color: colorScheme.primaryContainer,
+                          iconColor: colorScheme.onPrimaryContainer,
+                        ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.05),
 
-                    const SizedBox(height: 12),
+                        const SizedBox(height: 12),
 
-                    // Logout
-                    _buildActionTile(
-                      context,
-                      icon: Icons.logout_rounded,
-                      title: 'Đăng xuất',
-                      subtitle: 'Đăng xuất khỏi tài khoản',
-                      onTap: () => _showLogoutDialog(context, ref),
-                      color: colorScheme.errorContainer,
-                      iconColor: colorScheme.onErrorContainer,
-                    ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.05),
+                        // Logout
+                        _buildActionTile(
+                          context,
+                          icon: Icons.logout_rounded,
+                          title: 'Đăng xuất',
+                          subtitle: 'Đăng xuất khỏi tài khoản',
+                          onTap: () => _showLogoutDialog(context, ref),
+                          color: colorScheme.errorContainer,
+                          iconColor: colorScheme.onErrorContainer,
+                        ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.05),
 
-                    const SizedBox(height: 28),
+                        const SizedBox(height: 28),
 
-                    // Save button (bottom)
-                    if (_hasChanges)
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: FilledButton.icon(
-                          onPressed: _isSaving ? null : _saveProfile,
-                          icon: _isSaving
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Icon(Icons.save_rounded),
-                          label: Text(
-                            _isSaving ? 'Đang lưu...' : 'Lưu thay đổi',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                        // Save button (bottom)
+                        if (_hasChanges)
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: FilledButton.icon(
+                              onPressed: _isSaving ? null : _saveProfile,
+                              icon: _isSaving
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Icon(Icons.save_rounded),
+                              label: Text(
+                                _isSaving ? 'Đang lưu...' : 'Lưu thay đổi',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              style: FilledButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
                             ),
-                          ),
-                          style: FilledButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                        ),
-                      )
-                          .animate()
-                          .fadeIn(duration: 300.ms)
-                          .slideY(begin: 0.1),
-                  ],
+                          )
+                              .animate()
+                              .fadeIn(duration: 300.ms)
+                              .slideY(begin: 0.1),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-          ),
           ),
         ],
       ),

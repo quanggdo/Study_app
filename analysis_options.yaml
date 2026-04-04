@@ -2,10 +2,12 @@ include: package:flutter_lints/flutter.yaml
 
 linter:
   rules:
-    - prefer_const_constructors
-    - prefer_const_literals_to_create_immutables
-    - prefer_final_fields
-    - avoid_print
-    - always_declare_return_types
-    - cancel_subscriptions
-    - close_sinks
+    # Isar generator có thể sinh ra các int64 schema/index id lớn; trên web sẽ bị rule này chặn.
+    avoid_js_rounded_ints: false
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_final_fields: true
+    avoid_print: true
+    always_declare_return_types: true
+    cancel_subscriptions: true
+    close_sinks: true

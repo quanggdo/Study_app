@@ -82,6 +82,54 @@ class ScheduleRepository {
     await batch.commit();
   }
 
+  Future<void> replaceAllSessionsFromImage({
+    required String uid,
+    required List<ClassSessionModel> sessions,
+  }) async {
+    final QuerySnapshot<Map<String, dynamic>> existing =
+        await _collection.where('u_id', isEqualTo: uid).get();
+
+    final WriteBatch batch = _firestore.batch();
+
+    for (final QueryDocumentSnapshot<Map<String, dynamic>> doc
+        in existing.docs) {
+      batch.delete(doc.reference);
+    }
+
+    for (final ClassSessionModel session in sessions) {
+      final DocumentReference<Map<String, dynamic>> docRef = _collection.doc();
+      batch.set(docRef, <String, dynamic>{
+        'u_id': uid,
+        'subject_name': session.subjectName,
+        'day_of_week': session.dayOfWeek,
+        'start_time': session.startTime,
+        'end_time': session.endTime,
+        'room': session.room,
+        'is_from_ocr': true,
+        'created_at': FieldValue.serverTimestamp(),
+      });
+    }
+
+    await batch.commit();
+  }
+
+  Future<void> updateSession({
+    required String sessionId,
+    required String subjectName,
+    required int dayOfWeek,
+    required String startTime,
+    required String endTime,
+    required String room,
+  }) async {
+    await _collection.doc(sessionId).update(<String, dynamic>{
+      'subject_name': subjectName,
+      'day_of_week': dayOfWeek,
+      'start_time': startTime,
+      'end_time': endTime,
+      'room': room,
+    });
+  }
+
   Future<void> deleteSession(String sessionId) async {
     await _collection.doc(sessionId).delete();
   }
