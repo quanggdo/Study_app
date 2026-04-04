@@ -98,64 +98,6 @@ class QuizScreen extends ConsumerWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(quiz.title),
-          bottom: isTimeLimited
-              ? PreferredSize(
-                  preferredSize: const Size.fromHeight(40),
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: danger
-                              ? Theme.of(context)
-                                  .colorScheme
-                                  .error
-                                  .withValues(alpha: 0.12)
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .primary
-                                  .withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(
-                            color: danger
-                                ? Theme.of(context).colorScheme.error
-                                : Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.timer_rounded,
-                              size: 16,
-                              color: danger
-                                  ? Theme.of(context).colorScheme.error
-                                  : Theme.of(context).colorScheme.primary,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              _formatRemaining(remaining),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: danger
-                                        ? Theme.of(context).colorScheme.error
-                                        : Theme.of(context).colorScheme.primary,
-                                  ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              : null,
         ),
         body: Padding(
           padding: const EdgeInsets.all(16),
@@ -356,42 +298,97 @@ class QuizScreen extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              FilledButton.tonal(
-                onPressed: state.submitting || state.timeUp
-                    ? null
-                    : () async {
-                        final unanswered = total - answeredCount;
-                        final ok = await showDialog<bool>(
-                              context: context,
-                              builder: (ctx) => AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                title: const Text('Nộp bài?'),
-                                content: Text(
-                                  unanswered > 0
-                                      ? 'Bạn còn $unanswered câu chưa trả lời. Vẫn nộp bài chứ?'
-                                      : 'Bạn đã trả lời hết. Nộp bài chứ?',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(ctx, false),
-                                    child: const Text('Hủy'),
-                                  ),
-                                  FilledButton(
-                                    onPressed: () => Navigator.pop(ctx, true),
-                                    child: const Text('Nộp'),
-                                  ),
-                                ],
-                              ),
-                            ) ??
-                            false;
+              Row(
+                children: [
+                  Expanded(
+                    child: FilledButton.tonal(
+                      onPressed: state.submitting || state.timeUp
+                          ? null
+                          : () async {
+                              final unanswered = total - answeredCount;
+                              final ok = await showDialog<bool>(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      title: const Text('Nộp bài?'),
+                                      content: Text(
+                                        unanswered > 0
+                                            ? 'Bạn còn $unanswered câu chưa trả lời. Vẫn nộp bài chứ?'
+                                            : 'Bạn đã trả lời hết. Nộp bài chứ?',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(ctx, false),
+                                          child: const Text('Hủy'),
+                                        ),
+                                        FilledButton(
+                                          onPressed: () => Navigator.pop(ctx, true),
+                                          child: const Text('Nộp'),
+                                        ),
+                                      ],
+                                    ),
+                                  ) ??
+                                  false;
 
-                        if (!ok) return;
-                        await vm.submit();
-                      },
-                child: Text(
-                    'Nộp bài ngay (${total - answeredCount} chưa trả lời)'),
+                              if (!ok) return;
+                              await vm.submit();
+                            },
+                      child: Text(
+                          'Nộp bài ngay (${total - answeredCount} chưa trả lời)'),
+                    ),
+                  ),
+                  if (isTimeLimited) ...[
+                    const SizedBox(width: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: danger
+                            ? Theme.of(context)
+                                .colorScheme
+                                .error
+                                .withValues(alpha: 0.12)
+                            : Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: danger
+                              ? Theme.of(context).colorScheme.error
+                              : Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.timer_rounded,
+                            size: 16,
+                            color: danger
+                                ? Theme.of(context).colorScheme.error
+                                : Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            _formatRemaining(remaining),
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: danger
+                                      ? Theme.of(context).colorScheme.error
+                                      : Theme.of(context).colorScheme.primary,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ],
           ),

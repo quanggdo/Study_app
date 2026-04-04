@@ -51,6 +51,7 @@ class QuizAttempt with _$QuizAttempt {
     required int total,
     @JsonKey(name: 'score10') required double score10,
     @Default(<QuizReviewItem>[]) List<QuizReviewItem> review,
+    @JsonKey(name: 'duration_seconds') int? durationSeconds,
     DateTime? completedAt,
   }) = _QuizAttempt;
 

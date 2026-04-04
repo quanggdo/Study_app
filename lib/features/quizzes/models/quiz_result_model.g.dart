@@ -75,6 +75,7 @@ _$QuizAttemptImpl _$$QuizAttemptImplFromJson(Map<String, dynamic> json) =>
               ?.map((e) => QuizReviewItem.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const <QuizReviewItem>[],
+      durationSeconds: (json['duration_seconds'] as num?)?.toInt(),
       completedAt: json['completedAt'] == null
           ? null
           : DateTime.parse(json['completedAt'] as String),
@@ -89,5 +90,6 @@ Map<String, dynamic> _$$QuizAttemptImplToJson(_$QuizAttemptImpl instance) =>
       'total': instance.total,
       'score10': instance.score10,
       'review': instance.review,
+      'duration_seconds': instance.durationSeconds,
       'completedAt': instance.completedAt?.toIso8601String(),
     };

@@ -26,6 +26,7 @@ class QuizSessionState with _$QuizSessionState {
     int? remainingSeconds,
     @Default(false) bool timeUp,
     DateTime? endAt,
+    int? durationSeconds,
   }) = _QuizSessionState;
 }
 
@@ -38,6 +39,7 @@ class QuizSessionViewModel extends StateNotifier<QuizSessionState> {
     _sub = repo.watchQuiz(quizId).listen(
       (q) {
         if (q != null) {
+          _quizStartedAt ??= DateTime.now();
           _startTimerIfNeeded(q);
         }
         state = state.copyWith(loading: false, quiz: q, error: null);
@@ -55,6 +57,8 @@ class QuizSessionViewModel extends StateNotifier<QuizSessionState> {
   late final StreamSubscription _sub;
 
   Timer? _timer;
+
+  DateTime? _quizStartedAt;
 
   void _startTimerIfNeeded(Quiz quiz) {
     // Only start once
@@ -149,6 +153,13 @@ class QuizSessionViewModel extends StateNotifier<QuizSessionState> {
     return (score * 10 / total).clamp(0, 10).toDouble();
   }
 
+  int? _computeDurationSeconds() {
+    final startedAt = _quizStartedAt;
+    if (startedAt == null) return null;
+    final diff = DateTime.now().difference(startedAt).inSeconds;
+    return diff < 0 ? 0 : diff;
+  }
+
   Future<void> submit({bool auto = false}) async {
     final quiz = state.quiz;
     if (quiz == null) return;
@@ -160,6 +171,8 @@ class QuizSessionViewModel extends StateNotifier<QuizSessionState> {
               userChoice: state.answersByQId[qq.qId] ?? '',
             ))
         .toList();
+
+    final durationSeconds = _computeDurationSeconds();
 
     state = state.copyWith(submitting: true, error: null);
     try {
@@ -180,12 +193,17 @@ class QuizSessionViewModel extends StateNotifier<QuizSessionState> {
           total: result.total,
           score10: _score10(result.score, result.total),
           review: result.review,
+          durationSeconds: durationSeconds,
           completedAt: result.completedAt ?? DateTime.now(),
         );
         await repo.saveAttempt(uid: user.uid, attempt: attempt);
       }
 
-      state = state.copyWith(submitting: false, result: result);
+      state = state.copyWith(
+        submitting: false,
+        result: result,
+        durationSeconds: durationSeconds,
+      );
     } catch (e) {
       state = state.copyWith(submitting: false, error: e);
       if (auto) {

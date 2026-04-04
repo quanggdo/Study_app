@@ -66,7 +66,10 @@ class QuizLastAttemptScreen extends ConsumerWidget {
           if (attempt == null) {
             return const Center(child: Text('Chưa có bài làm.'));
           }
-          return QuizAttemptReviewScreen(attempt: attempt);
+          return QuizAttemptReviewScreen(
+            attempt: attempt,
+            showAppBar: false,
+          );
         },
       ),
     );
@@ -74,9 +77,21 @@ class QuizLastAttemptScreen extends ConsumerWidget {
 }
 
 class QuizAttemptReviewScreen extends ConsumerWidget {
-  const QuizAttemptReviewScreen({super.key, required this.attempt});
+  const QuizAttemptReviewScreen({
+    super.key,
+    required this.attempt,
+    this.showAppBar = true,
+  });
 
   final QuizAttempt attempt;
+  final bool showAppBar;
+
+  String _formatDuration(int? seconds) {
+    if (seconds == null) return '-';
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    return '${m}m ${s}s';
+  }
 
   Color _choiceColor({
     required BuildContext context,
@@ -127,13 +142,13 @@ class QuizAttemptReviewScreen extends ConsumerWidget {
         };
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Review bài làm')),
+          appBar: showAppBar ? AppBar(title: const Text('Review bài làm')) : null,
           body: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _ScoreCard(attempt: attempt),
+                _ScoreCard(attempt: attempt, durationText: _formatDuration(attempt.durationSeconds)),
                 const SizedBox(height: 12),
                 if (snap.hasError)
                   Padding(
@@ -296,6 +311,13 @@ class _AttemptCard extends StatelessWidget {
     return v.toStringAsFixed(1);
   }
 
+  String _formatDuration(int? seconds) {
+    if (seconds == null) return '-';
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    return '${m}m ${s}s';
+  }
+
   @override
   Widget build(BuildContext context) {
     final completedAt = attempt.completedAt;
@@ -308,7 +330,7 @@ class _AttemptCard extends StatelessWidget {
         leading: const Icon(Icons.history_rounded),
         title: Text(attempt.quizTitle),
         subtitle: Text(
-          'Điểm: ${attempt.score}/${attempt.total} • ${_formatScore10(attempt.score10)}/10 • $timeText',
+          'Điểm: ${attempt.score}/${attempt.total} • ${_formatScore10(attempt.score10)}/10 • ${_formatDuration(attempt.durationSeconds)} • $timeText',
         ),
         trailing: const Icon(Icons.chevron_right_rounded),
         onTap: onOpen,
@@ -318,9 +340,10 @@ class _AttemptCard extends StatelessWidget {
 }
 
 class _ScoreCard extends StatelessWidget {
-  const _ScoreCard({required this.attempt});
+  const _ScoreCard({required this.attempt, required this.durationText});
 
   final QuizAttempt attempt;
+  final String durationText;
 
   String _formatScore10(double value) {
     final v = value.isNaN ? 0 : value;
@@ -344,6 +367,10 @@ class _ScoreCard extends StatelessWidget {
                 'Điểm: ${_formatScore10(attempt.score10)}/10',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
+            ),
+            Text(
+              durationText,
+              style: Theme.of(context).textTheme.labelLarge,
             ),
           ],
         ),

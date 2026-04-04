@@ -74,6 +74,7 @@ class FirestoreQuizRepository implements QuizRepository {
                 'is_correct': r.isCorrect,
               })
           .toList(),
+      'duration_seconds': attempt.durationSeconds,
       // Dùng Timestamp cụ thể để tránh null/pending khi order.
       'completedAt': Timestamp.fromDate(completedAt),
       'createdAt': Timestamp.fromDate(completedAt),
@@ -100,6 +101,11 @@ class FirestoreQuizRepository implements QuizRepository {
     final score10 = data['score10'];
     if (score10 is num) {
       normalized['score10'] = score10.toDouble();
+    }
+
+    final durationSeconds = data['duration_seconds'];
+    if (durationSeconds is num) {
+      normalized['duration_seconds'] = durationSeconds.toInt();
     }
 
     return QuizAttempt.fromJson(normalized);
@@ -247,9 +253,19 @@ class FirestoreQuizRepository implements QuizRepository {
       normalized['createdAt'] = createdAt.toDate().toIso8601String();
     }
 
-    final rawTimeLimit = data['timeLimit'] ?? data['time_limit'];
+    final rawTimeLimit = data['timeLimit'] ??
+        data['time_limit'] ??
+        data['time'] ??
+        data['duration'] ??
+        data['duration_minutes'] ??
+        data['time_limit_minutes'];
     if (rawTimeLimit is num) {
       normalized['timeLimit'] = rawTimeLimit.toInt();
+    } else if (rawTimeLimit is String) {
+      final parsed = int.tryParse(rawTimeLimit.trim());
+      if (parsed != null) {
+        normalized['timeLimit'] = parsed;
+      }
     }
 
     final questions = data['questions'];

@@ -661,6 +661,8 @@ mixin _$QuizAttempt {
   @JsonKey(name: 'score10')
   double get score10 => throw _privateConstructorUsedError;
   List<QuizReviewItem> get review => throw _privateConstructorUsedError;
+  @JsonKey(name: 'duration_seconds')
+  int? get durationSeconds => throw _privateConstructorUsedError;
   DateTime? get completedAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -683,6 +685,7 @@ abstract class $QuizAttemptCopyWith<$Res> {
       int total,
       @JsonKey(name: 'score10') double score10,
       List<QuizReviewItem> review,
+      @JsonKey(name: 'duration_seconds') int? durationSeconds,
       DateTime? completedAt});
 }
 
@@ -706,6 +709,7 @@ class _$QuizAttemptCopyWithImpl<$Res, $Val extends QuizAttempt>
     Object? total = null,
     Object? score10 = null,
     Object? review = null,
+    Object? durationSeconds = freezed,
     Object? completedAt = freezed,
   }) {
     return _then(_value.copyWith(
@@ -737,6 +741,10 @@ class _$QuizAttemptCopyWithImpl<$Res, $Val extends QuizAttempt>
           ? _value.review
           : review // ignore: cast_nullable_to_non_nullable
               as List<QuizReviewItem>,
+      durationSeconds: freezed == durationSeconds
+          ? _value.durationSeconds
+          : durationSeconds // ignore: cast_nullable_to_non_nullable
+              as int?,
       completedAt: freezed == completedAt
           ? _value.completedAt
           : completedAt // ignore: cast_nullable_to_non_nullable
@@ -761,6 +769,7 @@ abstract class _$$QuizAttemptImplCopyWith<$Res>
       int total,
       @JsonKey(name: 'score10') double score10,
       List<QuizReviewItem> review,
+      @JsonKey(name: 'duration_seconds') int? durationSeconds,
       DateTime? completedAt});
 }
 
@@ -782,6 +791,7 @@ class __$$QuizAttemptImplCopyWithImpl<$Res>
     Object? total = null,
     Object? score10 = null,
     Object? review = null,
+    Object? durationSeconds = freezed,
     Object? completedAt = freezed,
   }) {
     return _then(_$QuizAttemptImpl(
@@ -813,6 +823,10 @@ class __$$QuizAttemptImplCopyWithImpl<$Res>
           ? _value._review
           : review // ignore: cast_nullable_to_non_nullable
               as List<QuizReviewItem>,
+      durationSeconds: freezed == durationSeconds
+          ? _value.durationSeconds
+          : durationSeconds // ignore: cast_nullable_to_non_nullable
+              as int?,
       completedAt: freezed == completedAt
           ? _value.completedAt
           : completedAt // ignore: cast_nullable_to_non_nullable
@@ -832,6 +846,7 @@ class _$QuizAttemptImpl implements _QuizAttempt {
       required this.total,
       @JsonKey(name: 'score10') required this.score10,
       final List<QuizReviewItem> review = const <QuizReviewItem>[],
+      @JsonKey(name: 'duration_seconds') this.durationSeconds,
       this.completedAt})
       : _review = review;
 
@@ -863,11 +878,14 @@ class _$QuizAttemptImpl implements _QuizAttempt {
   }
 
   @override
+  @JsonKey(name: 'duration_seconds')
+  final int? durationSeconds;
+  @override
   final DateTime? completedAt;
 
   @override
   String toString() {
-    return 'QuizAttempt(id: $id, quizId: $quizId, quizTitle: $quizTitle, score: $score, total: $total, score10: $score10, review: $review, completedAt: $completedAt)';
+    return 'QuizAttempt(id: $id, quizId: $quizId, quizTitle: $quizTitle, score: $score, total: $total, score10: $score10, review: $review, durationSeconds: $durationSeconds, completedAt: $completedAt)';
   }
 
   @override
@@ -883,6 +901,8 @@ class _$QuizAttemptImpl implements _QuizAttempt {
             (identical(other.total, total) || other.total == total) &&
             (identical(other.score10, score10) || other.score10 == score10) &&
             const DeepCollectionEquality().equals(other._review, _review) &&
+            (identical(other.durationSeconds, durationSeconds) ||
+                other.durationSeconds == durationSeconds) &&
             (identical(other.completedAt, completedAt) ||
                 other.completedAt == completedAt));
   }
@@ -898,6 +918,7 @@ class _$QuizAttemptImpl implements _QuizAttempt {
       total,
       score10,
       const DeepCollectionEquality().hash(_review),
+      durationSeconds,
       completedAt);
 
   @JsonKey(ignore: true)
@@ -923,6 +944,7 @@ abstract class _QuizAttempt implements QuizAttempt {
       required final int total,
       @JsonKey(name: 'score10') required final double score10,
       final List<QuizReviewItem> review,
+      @JsonKey(name: 'duration_seconds') final int? durationSeconds,
       final DateTime? completedAt}) = _$QuizAttemptImpl;
 
   factory _QuizAttempt.fromJson(Map<String, dynamic> json) =
@@ -945,6 +967,9 @@ abstract class _QuizAttempt implements QuizAttempt {
   double get score10;
   @override
   List<QuizReviewItem> get review;
+  @override
+  @JsonKey(name: 'duration_seconds')
+  int? get durationSeconds;
   @override
   DateTime? get completedAt;
   @override
