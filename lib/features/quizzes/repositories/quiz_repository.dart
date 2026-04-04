@@ -59,6 +59,11 @@ class FirestoreQuizRepository implements QuizRepository {
       normalized['createdAt'] = createdAt.toDate().toIso8601String();
     }
 
+    final rawTimeLimit = data['timeLimit'] ?? data['time_limit'];
+    if (rawTimeLimit is num) {
+      normalized['timeLimit'] = rawTimeLimit.toInt();
+    }
+
     final questions = data['questions'];
     if (questions is List) {
       normalized['questions'] = questions.map((q) {

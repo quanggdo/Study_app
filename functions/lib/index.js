@@ -72,7 +72,12 @@ exports.gradeQuiz = (0, https_1.onCall)(async (request) => {
         throw new https_1.HttpsError('failed-precondition', 'Chưa có đáp án cho quiz này (quiz_answers). Hãy migrate correct_answers sang quiz_answers.');
     }
     const ansData = ansSnap.data();
-    const answersMap = (ansData?.answers ?? {});
+    const correctAnswers = Array.isArray(ansData?.correct_answers) ? ansData.correct_answers : [];
+    const answersMap = Object.fromEntries(
+      correctAnswers
+        .map((item) => [String(item.q_id), String(item.correct_opt_id)])
+        .filter(([qId, optId]) => qId && optId)
+    );
     // 3) Grade
     const total = qIds.size;
     let score = 0;

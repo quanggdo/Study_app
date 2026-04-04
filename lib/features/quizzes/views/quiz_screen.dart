@@ -48,6 +48,7 @@ class QuizScreen extends ConsumerWidget {
     if (state.result != null) {
       return _QuizResultView(
         title: quiz.title,
+        quiz: quiz,
         result: state.result!,
         onBack: () => Navigator.of(context).pop(),
       );
@@ -446,13 +447,49 @@ class _QuestionGrid extends StatelessWidget {
 class _QuizResultView extends StatelessWidget {
   const _QuizResultView({
     required this.title,
+    required this.quiz,
     required this.result,
     required this.onBack,
   });
 
   final String title;
   final dynamic result;
+  final dynamic quiz;
   final VoidCallback onBack;
+
+  Color _choiceColor({
+    required BuildContext context,
+    required bool isUserChoice,
+    required bool isCorrectChoice,
+  }) {
+    if (isUserChoice && isCorrectChoice) {
+      return Theme.of(context).colorScheme.tertiaryContainer;
+    }
+    if (isUserChoice && !isCorrectChoice) {
+      return Theme.of(context).colorScheme.errorContainer;
+    }
+    if (!isUserChoice && isCorrectChoice) {
+      return Theme.of(context).colorScheme.secondaryContainer;
+    }
+    return Theme.of(context).colorScheme.surfaceContainerHighest;
+  }
+
+  Color _choiceBorder({
+    required BuildContext context,
+    required bool isUserChoice,
+    required bool isCorrectChoice,
+  }) {
+    if (isUserChoice && isCorrectChoice) {
+      return Theme.of(context).colorScheme.tertiary;
+    }
+    if (isUserChoice && !isCorrectChoice) {
+      return Theme.of(context).colorScheme.error;
+    }
+    if (!isUserChoice && isCorrectChoice) {
+      return Theme.of(context).colorScheme.secondary;
+    }
+    return Theme.of(context).dividerColor;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -460,6 +497,12 @@ class _QuizResultView extends StatelessWidget {
     final score = (result.score as int);
     final total = (result.total as int);
     final review = (result.review as List);
+    final questions = (quiz.questions as List);
+
+    final reviewByQId = {
+      for (final item in review)
+        (item.qId as String): item,
+    };
 
     return Scaffold(
       appBar: AppBar(
@@ -493,38 +536,126 @@ class _QuizResultView extends StatelessWidget {
             const SizedBox(height: 12),
             Expanded(
               child: ListView.separated(
-                itemCount: review.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                itemCount: questions.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, i) {
-                  final item = review[i] as dynamic;
-                  final qId = item.qId as String;
-                  final user = item.userChoice as String;
-                  final correct = item.correctChoice as String;
-                  final ok = item.isCorrect as bool;
+                  final q = questions[i] as dynamic;
+                  final qId = q.qId as String;
+                  final qText = q.question as String;
+                  final choices = q.choices as List;
+
+                  final item = reviewByQId[qId] as dynamic;
+                  final user = (item?.userChoice ?? '').toString();
+                  final correct = (item?.correctChoice ?? '').toString();
+                  final ok = (item?.isCorrect ?? false) as bool;
 
                   return Card(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Icon(
-                            ok ? Icons.check_circle : Icons.cancel,
-                            color: ok
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.error,
+                          Row(
+                            children: [
+                              Icon(
+                                ok ? Icons.check_circle : Icons.cancel,
+                                color: ok
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.error,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Câu ${i + 1}: $qText',
+                                  style: Theme.of(context).textTheme.titleMedium,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Câu: $qId'),
-                                const SizedBox(height: 4),
-                                Text('Bạn chọn: $user'),
-                                Text('Đúng: $correct'),
-                              ],
+                          const SizedBox(height: 10),
+                          ...choices.map((c) {
+                            final choice = c as dynamic;
+                            final choiceId = (choice.id ?? '').toString();
+                            final choiceText = (choice.text ?? '').toString();
+
+                            final isUserChoice = user == choiceId && user.isNotEmpty;
+                            final isCorrectChoice = correct == choiceId && correct.isNotEmpty;
+
+                            final bg = _choiceColor(
+                              context: context,
+                              isUserChoice: isUserChoice,
+                              isCorrectChoice: isCorrectChoice,
+                            );
+                            final border = _choiceBorder(
+                              context: context,
+                              isUserChoice: isUserChoice,
+                              isCorrectChoice: isCorrectChoice,
+                            );
+
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: bg,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: border),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 26,
+                                    height: 26,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: border,
+                                    ),
+                                    child: Text(
+                                      choiceId,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelLarge
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary,
+                                          ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(child: Text(choiceText)),
+                                  if (isCorrectChoice)
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8),
+                                      child: Icon(
+                                        Icons.check_circle,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .tertiary,
+                                      ),
+                                    ),
+                                  if (isUserChoice && !isCorrectChoice)
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8),
+                                      child: Icon(
+                                        Icons.close_rounded,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .error,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            );
+                          }),
+                          if (user.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(
+                                'Bạn chưa trả lời câu này.',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ),

@@ -122,9 +122,10 @@ class QuizSessionViewModel extends StateNotifier<QuizSessionState> {
     if (state.submitting || state.result != null) return;
 
     final answers = quiz.questions
-        .where((qq) => state.answersByQId.containsKey(qq.qId))
-        .map((qq) =>
-            UserAnswer(qId: qq.qId, userChoice: state.answersByQId[qq.qId]!))
+        .map((qq) => UserAnswer(
+              qId: qq.qId,
+              userChoice: state.answersByQId[qq.qId] ?? '',
+            ))
         .toList();
 
     state = state.copyWith(submitting: true, error: null);
