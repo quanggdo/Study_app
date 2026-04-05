@@ -162,8 +162,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
 
       await _repository.updateUserProfile(updatedUser);
-      // Invalidate dashboard stats ke refresh streak và study time
+      // Invalidate tất cả providers để refresh dashboard, streak, study time, tasks
+      _ref.invalidate(dashboardStatsProvider);
       _ref.invalidate(studyTimeStatsProvider);
+      _ref.invalidate(quizStatsProvider);
       _ref.invalidate(targetStudyTimeProvider);
       state = state.copyWith(user: updatedUser);
       return true;

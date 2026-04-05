@@ -70,8 +70,10 @@ class PomodoroViewModel extends StateNotifier<PomodoroState> {
       final col = FirebaseFirestore.instance.collection('focus_sessions');
       await col.add(session.toMap());
       
-      // Invalidate providers để refresh data
+      // Invalidate tất cả providers để refresh dashboard + hôm nay stats
+      _ref.invalidate(dashboardStatsProvider);
       _ref.invalidate(studyTimeStatsProvider);
+      _ref.invalidate(quizStatsProvider);
       _ref.invalidate(targetStudyTimeProvider);
     } catch (e) {
       // ignore errors here; caller may show UI
