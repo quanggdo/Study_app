@@ -621,11 +621,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           child: Icon(icon, size: 20, color: colorScheme.primary),
         ),
         const SizedBox(width: 12),
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+        Flexible(
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );

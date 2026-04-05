@@ -285,47 +285,104 @@ class _StudyTimeStatCard extends StatelessWidget {
                 color: colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Column(
-                    children: [
-                      Text(
-                        'Tổng tuần',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: colorScheme.outline,
-                        ),
-                      ),
-                      Text(
-                        '${studyStats.totalMinutes}',
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  VerticalDivider(
-                    color: colorScheme.outline.withOpacity(0.3),
-                  ),
-                  Column(
-                    children: [
-                      Text(
-                        'Trung bình/ngày',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: colorScheme.outline,
-                        ),
-                      ),
-                      Text(
-                        (studyStats.totalMinutes / 7).toStringAsFixed(0),
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+              child: LayoutBuilder(
+                builder: (ctx, constraints) {
+                  bool isNarrow = constraints.maxWidth < 280;
+                  return isNarrow
+                      ? Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Column(
+                                  children: [
+                                    Text(
+                                      'Tổng tuần',
+                                      style: theme.textTheme.labelSmall?.copyWith(
+                                        color: colorScheme.outline,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${studyStats.totalMinutes}',
+                                      style: theme.textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: colorScheme.primary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Divider(
+                              color: colorScheme.outline.withOpacity(0.3),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Column(
+                                  children: [
+                                    Text(
+                                      'Trung bình/ngày',
+                                      style: theme.textTheme.labelSmall?.copyWith(
+                                        color: colorScheme.outline,
+                                      ),
+                                    ),
+                                    Text(
+                                      (studyStats.totalMinutes / 7).toStringAsFixed(0),
+                                      style: theme.textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: colorScheme.primary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Column(
+                              children: [
+                                Text(
+                                  'Tổng tuần',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: colorScheme.outline,
+                                  ),
+                                ),
+                                Text(
+                                  '${studyStats.totalMinutes}',
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: colorScheme.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            VerticalDivider(
+                              color: colorScheme.outline.withOpacity(0.3),
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  'Trung bình/ngày',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: colorScheme.outline,
+                                  ),
+                                ),
+                                Text(
+                                  (studyStats.totalMinutes / 7).toStringAsFixed(0),
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: colorScheme.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                },
               ),
             ),
           ],
@@ -418,9 +475,12 @@ class _QuizScoresChart extends StatelessWidget {
         // Legend
         Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: Row(
+          child: Wrap(
+            spacing: 32,
+            runSpacing: 8,
             children: [
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
                     width: 12,
@@ -437,8 +497,8 @@ class _QuizScoresChart extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(width: 24),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
                     width: 12,
