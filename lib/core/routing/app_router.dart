@@ -10,6 +10,8 @@ import 'package:student_academic_assistant/features/auth/views/profile_screen.da
 import 'package:student_academic_assistant/features/auth/views/register_screen.dart';
 import 'package:student_academic_assistant/features/dashboard/views/home_screen.dart';
 import 'package:student_academic_assistant/features/dashboard/views/study_hub_screen.dart';
+import 'package:student_academic_assistant/features/academic_schedule/views/timetable_screen.dart';
+import 'package:student_academic_assistant/features/dashboard/views/statistics_screen.dart';
 import 'package:student_academic_assistant/features/notes_reminders/views/notes_reminders_screen.dart';
 import 'package:student_academic_assistant/features/flashcards/views/flashcards_screen.dart';
 import 'package:student_academic_assistant/features/quizzes/views/quiz_screen.dart';
@@ -70,6 +72,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const StudyHubScreen(),
       ),
       GoRoute(
+        path: '/schedule',
+        builder: (context, state) => const TimetableScreen(),
+      ),
+      GoRoute(
         path: '/change-password',
         builder: (context, state) => const ChangePasswordScreen(),
       ),
@@ -88,6 +94,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/flashcards',
         builder: (context, state) => const FlashcardsScreen(),
+      ),
+      GoRoute(
+        path: '/statistics',
+        builder: (context, state) => const StatisticsScreen(),
       ),
       GoRoute(
         path: '/quizzes',

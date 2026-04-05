@@ -164,6 +164,8 @@ class HomeScreen extends ConsumerWidget {
                   ],
                 ),
                 delay: 530,
+                isAvailable: true,
+                onTap: () => context.push('/schedule'),
               ),
               _buildFeatureCard(
                 context,
@@ -250,6 +252,8 @@ class HomeScreen extends ConsumerWidget {
                   ],
                 ),
                 delay: 770,
+                isAvailable: true,
+                onTap: () => context.push('/statistics'),
               ),
             ],
           ),
