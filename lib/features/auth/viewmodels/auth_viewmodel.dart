@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:student_academic_assistant/features/auth/models/user_model.dart';
 import 'package:student_academic_assistant/features/auth/repositories/auth_repository.dart';
+import 'package:student_academic_assistant/features/dashboard/viewmodels/stats_viewmodel.dart';
 
 // =============================================================================
 // Auth Status
@@ -44,8 +45,9 @@ class AuthState {
 // =============================================================================
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _repository;
+  final Ref _ref;
 
-  AuthNotifier(this._repository) : super(const AuthState()) {
+  AuthNotifier(this._repository, this._ref) : super(const AuthState()) {
     _initialize();
   }
 
@@ -160,6 +162,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
 
       await _repository.updateUserProfile(updatedUser);
+      // Invalidate dashboard stats ke refresh streak và study time
+      _ref.invalidate(studyTimeStatsProvider);
+      _ref.invalidate(targetStudyTimeProvider);
       state = state.copyWith(user: updatedUser);
       return true;
     } catch (e) {
@@ -257,7 +262,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 final authNotifierProvider =
     StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final repository = ref.watch(authRepositoryProvider);
-  return AuthNotifier(repository);
+  return AuthNotifier(repository, ref);
 });
 
 final authStateChangesProvider = StreamProvider<User?>((ref) {

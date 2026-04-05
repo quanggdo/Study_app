@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/dashboard_stats_model.dart';
@@ -66,8 +67,14 @@ class DashboardRepository {
       dailyMinutes[i] = dailyMap[i] ?? 0;
     }
 
-    // Calculate streak (consecutive days with >= 30 minutes from the end)
-    final streak = _calculateStreak(dailyMinutes, threshold: 30);
+    // Lấy mục tiêu học tập từ Firestore (với fallback mặc định)
+    final targetTime = await getTargetStudyTime();
+
+    // Calculate streak (consecutive days with >= target time from the end)
+    final streak = _calculateStreak(dailyMinutes, threshold: targetTime);
+
+    // Lưu streak vào Firestore (async, không block flow)
+    unawaited(saveStreak(streak));
 
     // Calculate total minutes
     final totalMinutes = dailyMinutes.fold<int>(0, (a, b) => a + b);
@@ -175,6 +182,37 @@ class DashboardRepository {
     }
   }
 
+  /// Lấy mục tiêu thời gian học hàng ngày của user từ Firestore
+  /// Returns target_study_time in minutes from users collection
+  Future<int> getTargetStudyTime() async {
+    final userId = _userId;
+    if (userId == null) {
+      throw Exception('User not authenticated');
+    }
+
+    try {
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      if (!userDoc.exists) {
+        // Default to 240 minutes (4 hours) if not found
+        return 240;
+      }
+
+      final data = userDoc.data();
+      final targetTime = data?['target_study_time'] as num?;
+      
+      if (targetTime == null) {
+        // Default to 240 minutes if field doesn't exist
+        return 240;
+      }
+
+      return targetTime.toInt();
+    } catch (e) {
+      print('Error getting target study time: $e');
+      // Fallback to 240 minutes on error
+      return 240;
+    }
+  }
+
   /// Lấy tất cả thống kê dashboard
   Future<DashboardStats> getDashboardStats() async {
     final studyTimeStats = await getStudyTimeStats();
@@ -228,5 +266,57 @@ class DashboardRepository {
       }
     }
     return streak;
+  }
+
+  /// Lưu streak vào Firestore
+  /// Saves the calculated streak to user_streaks collection with today's date
+  Future<void> saveStreak(int streak) async {
+    final userId = _userId;
+    if (userId == null) {
+      throw Exception('User not authenticated');
+    }
+
+    try {
+      final today = DateTime.now();
+      final dateKey = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+      
+      await _firestore
+          .collection('user_streaks')
+          .doc(userId)
+          .set({
+            'streak': streak,
+            'lastUpdated': FieldValue.serverTimestamp(),
+            'dateKey': dateKey,
+          }, SetOptions(merge: true));
+    } catch (e) {
+      // Log lỗi nhưng không break flow
+      print('Error saving streak: $e');
+    }
+  }
+
+  /// Lấy streak từ Firestore (nếu có)
+  /// Reads the streak value from Firestore if it exists and was updated today
+  Future<int?> getStreakFromFirestore() async {
+    final userId = _userId;
+    if (userId == null) return null;
+
+    try {
+      final doc = await _firestore.collection('user_streaks').doc(userId).get();
+      if (!doc.exists) return null;
+
+      final data = doc.data();
+      final dateKey = data?['dateKey'] as String?;
+      final today = DateTime.now();
+      final todayKey = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+
+      // Chỉ trả về nếu đó là dữ liệu hôm nay
+      if (dateKey == todayKey) {
+        return data?['streak'] as int?;
+      }
+      return null;
+    } catch (e) {
+      print('Error reading streak from Firestore: $e');
+      return null;
+    }
   }
 }
