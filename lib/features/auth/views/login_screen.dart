@@ -339,13 +339,16 @@ class _GradientButton extends StatelessWidget {
                   children: [
                     Icon(icon, color: Colors.white, size: 20),
                     const SizedBox(width: 10),
-                    Text(
-                      label,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.3,
+                    Flexible(
+                      child: Text(
+                        label,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.3,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],

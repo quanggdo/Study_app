@@ -548,26 +548,32 @@ class _TaskTab extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Row(
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
                       children: [
-                        Icon(
-                          Icons.schedule_rounded,
-                          size: 14,
-                          color: task.isCompleted
-                              ? Colors.grey.shade500
-                              : Theme.of(context).colorScheme.onSurfaceVariant,
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.schedule_rounded,
+                              size: 14,
+                              color: task.isCompleted
+                                  ? Colors.grey.shade500
+                                  : Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              DateFormat('dd/MM/yyyy HH:mm').format(task.deadline),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: task.isCompleted
+                                    ? Colors.grey.shade500
+                                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          DateFormat('dd/MM/yyyy HH:mm').format(task.deadline),
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            color: task.isCompleted
-                                ? Colors.grey.shade500
-                                : Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,

@@ -31,31 +31,36 @@ class HomeScreen extends ConsumerWidget {
             gradient: AppTheme.heroGradient,
           ),
         ),
-        title: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.25), width: 1),
+        title: Flexible(
+          child: Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.25), width: 1),
+                ),
+                child: const Icon(Icons.school_rounded,
+                    color: Colors.white, size: 18),
               ),
-              child: const Icon(Icons.school_rounded,
-                  color: Colors.white, size: 18),
-            ),
-            const SizedBox(width: 10),
-            const Text(
-              'SAA',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: 18,
-                letterSpacing: 1.2,
+              const SizedBox(width: 10),
+              const Flexible(
+                child: Text(
+                  'SAA',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 18,
+                    letterSpacing: 1.2,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           _AppBarButton(
@@ -101,7 +106,7 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 28),
 
               // ── Today Stats (Streak + Task Completion) ──
-              _TodayStatsCard(),
+              const _TodayStatsCard(),
 
               const SizedBox(height: 28),
 
@@ -305,90 +310,191 @@ class HomeScreen extends ConsumerWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  // Avatar
-                  GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 0.18),
-                        border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.35), width: 2),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: user?.photoUrl != null &&
-                              user!.photoUrl!.isNotEmpty
-                          ? Image.network(
-                              user.photoUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Icon(
-                                Icons.person_rounded,
-                                color: Colors.white,
-                                size: 28,
+              LayoutBuilder(
+                builder: (ctx, constraints) {
+                  bool isNarrow = constraints.maxWidth < 240;
+                  return isNarrow
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                // Avatar
+                                GestureDetector(
+                                  onTap: () {},
+                                  child: Container(
+                                    width: 56,
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white.withValues(alpha: 0.18),
+                                      border: Border.all(
+                                          color: Colors.white.withValues(alpha: 0.35), width: 2),
+                                    ),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: user?.photoUrl != null &&
+                                            user!.photoUrl!.isNotEmpty
+                                        ? Image.network(
+                                            user.photoUrl!,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) => const Icon(
+                                              Icons.person_rounded,
+                                              color: Colors.white,
+                                              size: 28,
+                                            ),
+                                          )
+                                        : const Icon(Icons.person_rounded,
+                                            color: Colors.white, size: 28),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Xin chào,',
+                                        style: TextStyle(
+                                          color: Colors.white.withValues(alpha: 0.75),
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                      Text(
+                                        user?.displayName ?? 'Sinh viên',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: -0.3,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            // Badge below on narrow
+                            Container(
+                              alignment: Alignment.centerLeft,
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.25), width: 1),
                               ),
-                            )
-                          : const Icon(Icons.person_rounded,
-                              color: Colors.white, size: 28),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Xin chào,',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.75),
-                            fontSize: 13,
-                          ),
-                        ),
-                        Text(
-                          user?.displayName ?? 'Sinh viên',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.3,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.25), width: 1),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.bolt_rounded,
-                            color: Colors.yellow.shade300, size: 14),
-                        const SizedBox(width: 3),
-                        const Text(
-                          'Active',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.bolt_rounded,
+                                      color: Color(0xFFFFD54F), size: 12),
+                                  SizedBox(width: 2),
+                                  Text(
+                                    'Active',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
+                      : Row(
+                          children: [
+                            // Avatar
+                            GestureDetector(
+                              onTap: () {},
+                              child: Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withValues(alpha: 0.18),
+                                  border: Border.all(
+                                      color: Colors.white.withValues(alpha: 0.35), width: 2),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: user?.photoUrl != null &&
+                                        user!.photoUrl!.isNotEmpty
+                                    ? Image.network(
+                                        user.photoUrl!,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => const Icon(
+                                          Icons.person_rounded,
+                                          color: Colors.white,
+                                          size: 28,
+                                        ),
+                                      )
+                                    : const Icon(Icons.person_rounded,
+                                        color: Colors.white, size: 28),
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Xin chào,',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(alpha: 0.75),
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  Text(
+                                    user?.displayName ?? 'Sinh viên',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: -0.3,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            // Badge - responsive
+                            Flexible(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                      color: Colors.white.withValues(alpha: 0.25), width: 1),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.bolt_rounded,
+                                        color: Color(0xFFFFD54F), size: 12),
+                                    SizedBox(width: 2),
+                                    Text(
+                                      'Active',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                },
               ),
               const SizedBox(height: 16),
               Container(
@@ -610,165 +716,175 @@ class _TodayStatsCard extends ConsumerWidget {
                     ? Colors.white.withValues(alpha: 0.7)
                     : colorScheme.outline;
 
-                return Row(
-                  children: [
-                    // Streak Card
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: isStreakActive
-                              ? Colors.red.withValues(alpha: isDark ? 0.25 : 0.12)
-                              : colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isStreakActive
+                final screenWidth = MediaQuery.of(context).size.width;
+                final isCompact = screenWidth < 500;
+
+                // Reusable stat card builder
+                Widget buildStatCard({
+                  required String label,
+                  required String value,
+                  required String unit,
+                  required IconData icon,
+                  required Color accentColor,
+                  required Color containerColor,
+                  required Color borderColor,
+                  required bool isExpanded,
+                }) {
+                  return Expanded(
+                    flex: isExpanded ? 1 : 1,
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: containerColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: borderColor),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            label,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: labelColor,
+                              fontSize: 10,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Icon(icon, color: accentColor, size: 18),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  value,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: accentColor,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 2),
+                              Text(
+                                unit,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: labelColor,
+                                  fontSize: 9,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                // Layout based on screen width
+                if (isCompact) {
+                  // Two rows: (Streak + Hôm nay) on top, Tasks below
+                  return Column(
+                    children: [
+                      Row(
+                        children: [
+                          buildStatCard(
+                            label: 'Streak',
+                            value: '${studyStats.streak}',
+                            unit: 'ngày',
+                            icon: Icons.local_fire_department_rounded,
+                            accentColor: isStreakActive ? Colors.red : colorScheme.primary,
+                            containerColor: isStreakActive
+                                ? Colors.red.withValues(alpha: isDark ? 0.25 : 0.12)
+                                : colorScheme.primaryContainer,
+                            borderColor: isStreakActive
                                 ? Colors.red.withValues(alpha: 0.4)
                                 : colorScheme.primary.withValues(alpha: 0.2),
+                            isExpanded: true,
                           ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Streak',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: labelColor,
-                                fontSize: 11,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.local_fire_department_rounded,
-                                  color: isStreakActive ? Colors.red : colorScheme.primary,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  '${studyStats.streak}',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: isStreakActive ? Colors.red : colorScheme.primary,
-                                  ),
-                                ),
-                                const SizedBox(width: 3),
-                                Text(
-                                  'ngày',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: labelColor,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    // Study Minutes Card
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: isStudyGoalMet
-                              ? Colors.green.withValues(alpha: isDark ? 0.25 : 0.12)
-                              : colorScheme.tertiary.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isStudyGoalMet
+                          const SizedBox(width: 8),
+                          buildStatCard(
+                            label: 'Hôm nay',
+                            value: '$todayMinutes',
+                            unit: 'phút',
+                            icon: Icons.schedule_rounded,
+                            accentColor: isStudyGoalMet ? Colors.green : colorScheme.tertiary,
+                            containerColor: isStudyGoalMet
+                                ? Colors.green.withValues(alpha: isDark ? 0.25 : 0.12)
+                                : colorScheme.tertiary.withValues(alpha: 0.15),
+                            borderColor: isStudyGoalMet
                                 ? Colors.green.withValues(alpha: 0.4)
                                 : colorScheme.tertiary.withValues(alpha: 0.3),
+                            isExpanded: true,
                           ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Hôm nay',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: labelColor,
-                                fontSize: 11,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.schedule_rounded,
-                                  color: isStudyGoalMet ? Colors.green : colorScheme.tertiary,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  '$todayMinutes',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: isStudyGoalMet ? Colors.green : colorScheme.tertiary,
-                                  ),
-                                ),
-                                const SizedBox(width: 3),
-                                Text(
-                                  'phút',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: labelColor,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    // Task Completion Card
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: colorScheme.secondaryContainer,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: colorScheme.secondary.withValues(alpha: 0.2),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          buildStatCard(
+                            label: 'Tasks',
+                            value: '${quizData.taskCompletionPercentage.toStringAsFixed(0)}%',
+                            unit: '',
+                            icon: Icons.check_circle_rounded,
+                            accentColor: colorScheme.secondary,
+                            containerColor: colorScheme.secondaryContainer,
+                            borderColor: colorScheme.secondary.withValues(alpha: 0.2),
+                            isExpanded: true,
                           ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Tasks',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: labelColor,
-                                fontSize: 11,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.check_circle_rounded,
-                                  color: colorScheme.secondary,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  '${quizData.taskCompletionPercentage.toStringAsFixed(0)}%',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: colorScheme.secondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
-                    ),
-                  ],
-                );
+                    ],
+                  );
+                } else {
+                  // Wide screen: all 3 cards in one row
+                  return Row(
+                    children: [
+                      buildStatCard(
+                        label: 'Streak',
+                        value: '${studyStats.streak}',
+                        unit: 'ngày',
+                        icon: Icons.local_fire_department_rounded,
+                        accentColor: isStreakActive ? Colors.red : colorScheme.primary,
+                        containerColor: isStreakActive
+                            ? Colors.red.withValues(alpha: isDark ? 0.25 : 0.12)
+                            : colorScheme.primaryContainer,
+                        borderColor: isStreakActive
+                            ? Colors.red.withValues(alpha: 0.4)
+                            : colorScheme.primary.withValues(alpha: 0.2),
+                        isExpanded: true,
+                      ),
+                      const SizedBox(width: 8),
+                      buildStatCard(
+                        label: 'Hôm nay',
+                        value: '$todayMinutes',
+                        unit: 'phút',
+                        icon: Icons.schedule_rounded,
+                        accentColor: isStudyGoalMet ? Colors.green : colorScheme.tertiary,
+                        containerColor: isStudyGoalMet
+                            ? Colors.green.withValues(alpha: isDark ? 0.25 : 0.12)
+                            : colorScheme.tertiary.withValues(alpha: 0.15),
+                        borderColor: isStudyGoalMet
+                            ? Colors.green.withValues(alpha: 0.4)
+                            : colorScheme.tertiary.withValues(alpha: 0.3),
+                        isExpanded: true,
+                      ),
+                      const SizedBox(width: 8),
+                      buildStatCard(
+                        label: 'Tasks',
+                        value: '${quizData.taskCompletionPercentage.toStringAsFixed(0)}%',
+                        unit: '',
+                        icon: Icons.check_circle_rounded,
+                        accentColor: colorScheme.secondary,
+                        containerColor: colorScheme.secondaryContainer,
+                        borderColor: colorScheme.secondary.withValues(alpha: 0.2),
+                        isExpanded: true,
+                      ),
+                    ],
+                  );
+                }
               },
             );
           },

@@ -368,51 +368,66 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> with SingleTick
                             ),
                           ),
                           const SizedBox(height: 18),
-                          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                            SizedBox(
-                              height: 44,
-                              child: FilledButton(
-                                onPressed: state.status == PomodoroStatus.running
-                                    ? () {
-                                        vm.pause();
-                                        try {
-                                          _videoController?.pause();
-                                        } catch (_) {}
-                                      }
-                                    : () {
-                                        vm.start();
+                          LayoutBuilder(
+                            builder: (ctx, constraints) {
+                              // Stack buttons vertically on very narrow screens
+                              bool isNarrow = constraints.maxWidth < 280;
+                              
+                              List<Widget> buttons = [
+                                Flexible(
+                                  child: SizedBox(
+                                    height: 44,
+                                    child: FilledButton(
+                                      onPressed: state.status == PomodoroStatus.running
+                                          ? () {
+                                              vm.pause();
+                                              try {
+                                                _videoController?.pause();
+                                              } catch (_) {}
+                                            }
+                                          : () {
+                                              vm.start();
+                                            },
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor: const Color(0xFFE53935),
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                          side: const BorderSide(color: Color(0xFFE53935)),
+                                        ),
+                                      ),
+                                      child: Text(state.status == PomodoroStatus.running ? 'Tạm dừng' : 'Bắt đầu'),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: isNarrow ? 0 : 12, height: isNarrow ? 12 : 0),
+                                Flexible(
+                                  child: SizedBox(
+                                    height: 44,
+                                    child: FilledButton(
+                                      onPressed: () {
+                                        vm.reset();
+                                        _stopAndResetVideo();
                                       },
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: const Color(0xFFE53935),
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    side: const BorderSide(color: Color(0xFFE53935)),
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor: const Color(0xFF1E88E5),
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                          side: const BorderSide(color: Color(0xFF1E88E5)),
+                                        ),
+                                      ),
+                                      child: const Text('Đặt lại'),
+                                    ),
                                   ),
                                 ),
-                                child: Text(state.status == PomodoroStatus.running ? 'Tạm dừng' : 'Bắt đầu'),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            SizedBox(
-                              height: 44,
-                              child: FilledButton(
-                                onPressed: () {
-                                  vm.reset();
-                                  _stopAndResetVideo();
-                                },
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: const Color(0xFF1E88E5),
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    side: const BorderSide(color: Color(0xFF1E88E5)),
-                                  ),
-                                ),
-                                child: const Text('Đặt lại'),
-                              ),
-                            ),
-                          ]),
+                              ];
+                              
+                              return isNarrow
+                                  ? Column(children: buttons)
+                                  : Row(mainAxisAlignment: MainAxisAlignment.center, children: buttons);
+                            },
+                          ),
                         ],
                       ),
                     ],
