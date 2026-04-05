@@ -1,44 +1,25 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:student_academic_assistant/core/theme/app_theme.dart';
 import 'package:student_academic_assistant/core/widgets/responsive_center.dart';
-import 'package:student_academic_assistant/features/notes_reminders/models/note_model.dart';
-import 'package:student_academic_assistant/features/notes_reminders/models/task_model.dart';
-import 'package:student_academic_assistant/features/notes_reminders/viewmodels/notes_reminders_viewmodel.dart';
+import 'package:student_academic_assistant/features/tasks/models/task_model.dart';
+import 'package:student_academic_assistant/features/tasks/viewmodels/tasks_viewmodel.dart';
 
-class NotesRemindersScreen extends ConsumerStatefulWidget {
-  const NotesRemindersScreen({super.key});
+class TasksScreen extends ConsumerStatefulWidget {
+  const TasksScreen({super.key});
 
   @override
-  ConsumerState<NotesRemindersScreen> createState() => _NotesRemindersScreenState();
+  ConsumerState<TasksScreen> createState() => _TasksScreenState();
 }
 
-class _NotesRemindersScreenState extends ConsumerState<NotesRemindersScreen>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() {
-      if (mounted) setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
+class _TasksScreenState extends ConsumerState<TasksScreen> {
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(notesRemindersViewModelProvider);
-    final vm = ref.read(notesRemindersViewModelProvider.notifier);
+    final state = ref.watch(tasksViewModelProvider);
+    final vm = ref.read(tasksViewModelProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -52,80 +33,55 @@ class _NotesRemindersScreenState extends ConsumerState<NotesRemindersScreen>
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
-          'Nhắc lịch và ghi chú môn học',
+          'Nhắc lịch / deadline',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w700,
             fontSize: 18,
           ),
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white.withOpacity(0.6),
-          indicatorColor: Colors.white,
-          tabs: const [
-            Tab(text: 'Nhắc lịch  deadline'),
-            Tab(text: 'Ghi chú môn học'),
-          ],
-        ),
       ),
       body: ResponsiveCenter(
         maxWidth: 600,
         child: Column(
           children: [
-          if (state.isLoading) const LinearProgressIndicator(minHeight: 2),
-          if (state.errorMessage != null)
-            Container(
-              width: double.infinity,
-              color: Theme.of(context).colorScheme.errorContainer,
-              padding: const EdgeInsets.all(12),
-              child: Text(
-                state.errorMessage!,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onErrorContainer,
+            if (state.isLoading) const LinearProgressIndicator(minHeight: 2),
+            if (state.errorMessage != null)
+              Container(
+                width: double.infinity,
+                color: Theme.of(context).colorScheme.errorContainer,
+                padding: const EdgeInsets.all(12),
+                child: Text(
+                  state.errorMessage!,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                  ),
                 ),
               ),
+            Expanded(
+              child: _TaskTab(
+                tasks: state.tasks,
+                onToggle: vm.toggleTask,
+                onDelete: vm.deleteTask,
+                onEdit: (task) => _showEditTaskDialog(context, vm, task),
+              ),
             ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _TaskTab(
-                  tasks: state.tasks,
-                  onToggle: vm.toggleTask,
-                  onDelete: vm.deleteTask,
-                  onEdit: (task) => _showEditTaskDialog(context, vm, task),
-                ),
-                _NotesTab(
-                  notes: state.notes,
-                  onDelete: vm.deleteNote,
-                  onEdit: (note) => _showEditNoteDialog(context, vm, note),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          if (_tabController.index == 0) {
-            await _showCreateTaskDialog(context, vm);
-            return;
-          }
-          await _showCreateNoteDialog(context, vm);
+          await _showCreateTaskDialog(context, vm);
         },
         icon: const Icon(Icons.add_rounded),
-        label:
-            Text(_tabController.index == 0 ? 'Thêm nhắc lịch mới' : 'Thêm ghi chú mới'),
+        label: const Text('Thêm nhắc lịch mới'),
       ),
     );
   }
 
   Future<void> _showCreateTaskDialog(
     BuildContext context,
-    NotesRemindersViewModel vm,
+    TasksViewModel vm,
   ) async {
     final titleCtrl = TextEditingController();
     DateTime selectedTime = DateTime.now().add(const Duration(minutes: 30));
@@ -139,7 +95,7 @@ class _NotesRemindersScreenState extends ConsumerState<NotesRemindersScreen>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            title: const Text('Tao nhac lich / deadline'),
+            title: const Text('Tạo nhắc lịch / deadline'),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -176,8 +132,7 @@ class _NotesRemindersScreenState extends ConsumerState<NotesRemindersScreen>
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     title: const Text('Thời điểm nhắc'),
-                    subtitle: Text(
-                        DateFormat('dd/MM/yyyy HH:mm').format(selectedTime)),
+                    subtitle: Text(DateFormat('dd/MM/yyyy HH:mm').format(selectedTime)),
                     trailing: const Icon(Icons.schedule_rounded),
                     onTap: () async {
                       final date = await showDatePicker(
@@ -211,7 +166,7 @@ class _NotesRemindersScreenState extends ConsumerState<NotesRemindersScreen>
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('Huy'),
+                child: const Text('Hủy'),
               ),
               FilledButton(
                 onPressed: () async {
@@ -231,19 +186,21 @@ class _NotesRemindersScreenState extends ConsumerState<NotesRemindersScreen>
                     );
                     return;
                   }
-                  await vm.createTask(
+                  final bool created = await vm.createTask(
                     title: titleCtrl.text,
                     deadline: selectedTime,
                     priority: priority,
                   );
-                  if (context.mounted) {
+                  if (!ctx.mounted) return;
+
+                  if (created) {
+                    Navigator.pop(ctx);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Đã thêm nhắc lịch/deadline.'),
                       ),
                     );
                   }
-                  if (mounted) Navigator.pop(ctx);
                 },
                 child: const Text('Lưu'),
               ),
@@ -254,80 +211,9 @@ class _NotesRemindersScreenState extends ConsumerState<NotesRemindersScreen>
     );
   }
 
-  Future<void> _showCreateNoteDialog(
-    BuildContext context,
-    NotesRemindersViewModel vm,
-  ) async {
-    final subjectIdCtrl = TextEditingController();
-    final contentCtrl = TextEditingController();
-
-    await showDialog<void>(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text('Tạo ghi chú môn học'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: subjectIdCtrl,
-                  decoration: const InputDecoration(labelText: 'Mã môn học'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: contentCtrl,
-                  maxLines: 5,
-                  decoration:
-                      const InputDecoration(labelText: 'Nội dung ghi chú'),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Hủy'),
-            ),
-            FilledButton(
-              onPressed: () async {
-                if (subjectIdCtrl.text.trim().isEmpty ||
-                    contentCtrl.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content:
-                          Text('Vui lòng nhập môn học và nội dung ghi chú.'),
-                    ),
-                  );
-                  return;
-                }
-                await vm.createNote(
-                  subjectId: subjectIdCtrl.text,
-                  content: contentCtrl.text,
-                );
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Đã thêm ghi chú môn học.'),
-                    ),
-                  );
-                }
-                if (mounted) Navigator.pop(ctx);
-              },
-              child: const Text('Lưu'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   Future<void> _showEditTaskDialog(
     BuildContext context,
-    NotesRemindersViewModel vm,
+    TasksViewModel vm,
     TaskModel task,
   ) async {
     final titleCtrl = TextEditingController(text: task.title);
@@ -383,11 +269,19 @@ class _NotesRemindersScreenState extends ConsumerState<NotesRemindersScreen>
                       ),
                       trailing: const Icon(Icons.schedule_rounded),
                       onTap: () async {
+                        final DateTime now = DateTime.now();
+                        final DateTime firstAllowedDate =
+                            DateTime(now.year, now.month, now.day);
+                        final DateTime initialDate =
+                            selectedTime.isBefore(firstAllowedDate)
+                                ? firstAllowedDate
+                                : selectedTime;
+
                         final date = await showDatePicker(
                           context: ctx,
-                          firstDate: DateTime.now(),
+                          firstDate: firstAllowedDate,
                           lastDate: DateTime(2100),
-                          initialDate: selectedTime,
+                          initialDate: initialDate,
                         );
                         if (date == null) return;
                         final time = await showTimePicker(
@@ -420,7 +314,15 @@ class _NotesRemindersScreenState extends ConsumerState<NotesRemindersScreen>
                     if (titleCtrl.text.trim().isEmpty) {
                       return;
                     }
-                    await vm.updateTask(
+                    if (selectedTime.isBefore(DateTime.now())) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Thời điểm nhắc phải ở tương lai.'),
+                        ),
+                      );
+                      return;
+                    }
+                    final bool updated = await vm.updateTask(
                       oldTask: task,
                       newTask: task.copyWith(
                         title: titleCtrl.text.trim(),
@@ -428,88 +330,22 @@ class _NotesRemindersScreenState extends ConsumerState<NotesRemindersScreen>
                         priority: priority,
                       ),
                     );
-                    if (context.mounted) {
+                    if (!ctx.mounted) return;
+
+                    if (updated) {
+                      Navigator.pop(ctx);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Đã cập nhật nhắc lịch/deadline.'),
                         ),
                       );
                     }
-                    if (context.mounted) Navigator.pop(ctx);
                   },
                   child: const Text('Cập nhật'),
                 ),
               ],
             );
           },
-        );
-      },
-    );
-  }
-
-  Future<void> _showEditNoteDialog(
-    BuildContext context,
-    NotesRemindersViewModel vm,
-    NoteModel note,
-  ) async {
-    final subjectIdCtrl = TextEditingController(text: note.subjectId);
-    final contentCtrl = TextEditingController(text: note.content);
-
-    await showDialog<void>(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text('Chỉnh sửa ghi chú môn học'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: subjectIdCtrl,
-                  decoration: const InputDecoration(labelText: 'Môn học'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: contentCtrl,
-                  maxLines: 5,
-                  decoration:
-                      const InputDecoration(labelText: 'Nội dung ghi chú'),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Hủy'),
-            ),
-            FilledButton(
-              onPressed: () async {
-                if (subjectIdCtrl.text.trim().isEmpty ||
-                    contentCtrl.text.trim().isEmpty) {
-                  return;
-                }
-                await vm.updateNote(
-                  note.copyWith(
-                    subjectId: subjectIdCtrl.text.trim(),
-                    content: contentCtrl.text.trim(),
-                  ),
-                );
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Đã cập nhật ghi chú.'),
-                    ),
-                  );
-                }
-                if (context.mounted) Navigator.pop(ctx);
-              },
-              child: const Text('Cập nhật'),
-            ),
-          ],
         );
       },
     );
@@ -539,7 +375,7 @@ class _TaskTab extends StatelessWidget {
             Icon(
               Icons.event_note_rounded,
               size: 64,
-              color: Colors.grey.withOpacity(0.3),
+              color: Colors.grey.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 16),
             Text(
@@ -641,7 +477,7 @@ class _TaskTab extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.35),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
@@ -669,8 +505,8 @@ class _TaskTab extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.25)
-                : Colors.black.withOpacity(0.04),
+                ? Colors.black.withValues(alpha: 0.25)
+                : Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -739,7 +575,7 @@ class _TaskTab extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color:
-                                _getPriorityColor(task.priority).withOpacity(0.1),
+                                _getPriorityColor(task.priority).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -770,9 +606,12 @@ class _TaskTab extends StatelessWidget {
 
   Color _getPriorityColor(TaskPriority priority) {
     switch (priority) {
-      case TaskPriority.high: return Colors.red;
-      case TaskPriority.medium: return Colors.orange;
-      case TaskPriority.low: return Colors.blue;
+      case TaskPriority.high:
+        return Colors.red;
+      case TaskPriority.medium:
+        return Colors.orange;
+      case TaskPriority.low:
+        return Colors.blue;
     }
   }
 
@@ -793,7 +632,7 @@ class _TaskTab extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -823,149 +662,3 @@ class _TaskTab extends StatelessWidget {
   }
 }
 
-class _NotesTab extends StatelessWidget {
-  final List<NoteModel> notes;
-  final Future<void> Function(String noteId) onDelete;
-  final Future<void> Function(NoteModel note) onEdit;
-
-  const _NotesTab({
-    required this.notes,
-    required this.onDelete,
-    required this.onEdit,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (notes.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.format_quote_rounded,
-              size: 64,
-              color: Colors.grey.withOpacity(0.3),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Bạn chưa có ghi chú nào',
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Ghi chú và lưu trữ kiến thức để dễ dàng hơn.',
-              style: TextStyle(
-                color: Colors.grey.shade500,
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ).animate().fadeIn(duration: 400.ms),
-      );
-    }
-
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      itemCount: notes.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final note = notes[index];
-        final delay = 100 + (index * 50);
-
-        return Container(
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1C1F2E) : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: isDark
-                    ? Colors.black.withOpacity(0.25)
-                    : Colors.black.withOpacity(0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            title: Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Text(
-                note.subjectId,
-                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15.5),
-              ),
-            ),
-            subtitle: Text(
-              note.content,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                height: 1.4,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            trailing: IconButton(
-              icon: const Icon(Icons.more_vert_rounded),
-              color: Colors.grey.shade500,
-              onPressed: () {
-                _showNoteOptions(context, note);
-              },
-            ),
-          ),
-        ).animate().fadeIn(delay: Duration(milliseconds: delay)).slideX(begin: 0.04);
-      },
-    );
-  }
-
-  void _showNoteOptions(BuildContext context, NoteModel note) {
-    showModalBottomSheet<void>(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (sheetContext) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                ListTile(
-                  leading: const Icon(Icons.edit_rounded, color: Colors.blue),
-                  title: const Text('Chỉnh sửa'),
-                  onTap: () {
-                    Navigator.pop(sheetContext);
-                    onEdit(note);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-                  title: const Text('Xóa', style: TextStyle(color: Colors.red)),
-                  onTap: () {
-                    Navigator.pop(sheetContext);
-                    onDelete(note.id);
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}

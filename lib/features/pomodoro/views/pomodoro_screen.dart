@@ -184,7 +184,7 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> with SingleTick
   //             decoration: BoxDecoration(
   //               color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1C1F2E) : Colors.white,
   //               borderRadius: BorderRadius.circular(20),
-  //               boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 14, offset: const Offset(0, 6))],
+  //               boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 14, offset: const Offset(0, 6))],
   //             ),
   //             child: Stack(
   //               alignment: Alignment.center,
@@ -334,7 +334,7 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> with SingleTick
                   decoration: BoxDecoration(
                     color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1C1F2E) : Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 14, offset: const Offset(0, 6))],
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 14, offset: const Offset(0, 6))],
                   ),
                   child: Stack(
                     alignment: Alignment.center,
@@ -417,7 +417,7 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> with SingleTick
           if (_showGreatJob)
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.6),
+                color: Colors.black.withValues(alpha: 0.6),
                 alignment: Alignment.center,
                 child: Lottie.asset('assets/lottie/great_job.json', width: 280, height: 280, fit: BoxFit.contain),
               ),
@@ -428,3 +428,4 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> with SingleTick
   }
 }
               
+

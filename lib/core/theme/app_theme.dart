@@ -1,4 +1,4 @@
-import 'package:flex_color_scheme/flex_color_scheme.dart';
+﻿import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -37,14 +37,14 @@ class AppTheme {
     scaffoldBackgroundColor: const Color(0xFFF5F6FA),
     cardTheme: CardThemeData(
       elevation: 0,
-      shadowColor: const Color(0xFF3949AB).withOpacity(0.10),
+      shadowColor: const Color(0xFF3949AB).withValues(alpha: 0.10),
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         elevation: 2,
-        shadowColor: const Color(0xFF3949AB).withOpacity(0.25),
+        shadowColor: const Color(0xFF3949AB).withValues(alpha: 0.25),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         padding: const EdgeInsets.symmetric(vertical: 14),
       ),
@@ -79,7 +79,7 @@ class AppTheme {
     scaffoldBackgroundColor: const Color(0xFF0F1117),
     cardTheme: CardThemeData(
       elevation: 0,
-      shadowColor: Colors.black.withOpacity(0.4),
+      shadowColor: Colors.black.withValues(alpha: 0.4),
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     ),
@@ -112,3 +112,4 @@ class AppTheme {
     stops: [0.0, 0.45, 1.0],
   );
 }
+
