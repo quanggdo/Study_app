@@ -26,28 +26,36 @@ class _AsrNotesScreenState extends ConsumerState<AsrNotesScreen> {
   @override
   void initState() {
     super.initState();
-    _initSpeech();
   }
 
-  Future<void> _initSpeech() async {
-    final bool isReady = await _speechToText.initialize();
+  void _onSpeechError(dynamic _) {
     if (!mounted) return;
     setState(() {
-      _speechReady = isReady;
+      _isListening = false;
+      _speechReady = false;
     });
   }
 
   @override
   void dispose() {
+    _speechToText.stop();
     _speechToText.cancel();
     super.dispose();
   }
 
-  Future<void> _handleMicUnavailable(BuildContext context) async {
-    final status = await Permission.microphone.status;
-    if (!mounted) return;
+  Future<bool> _ensureMicrophonePermission(BuildContext context) async {
+    PermissionStatus status = await Permission.microphone.status;
+    if (!mounted) return false;
 
-    if (status.isDenied || status.isPermanentlyDenied || status.isRestricted) {
+    if (status.isDenied) {
+      status = await Permission.microphone.request();
+    }
+
+    if (status.isGranted || status.isLimited) {
+      return true;
+    }
+
+    if (status.isPermanentlyDenied || status.isRestricted) {
       await showDialog<void>(
         context: context,
         builder: (ctx) {
@@ -78,14 +86,38 @@ class _AsrNotesScreenState extends ConsumerState<AsrNotesScreen> {
           );
         },
       );
-      return;
+      return false;
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Không thể bật microphone cho nhận diện giọng nói.'),
+        content: Text('Không có quyền microphone để nhận diện giọng nói.'),
       ),
     );
+    return false;
+  }
+
+  Future<bool> _ensureSpeechReady(BuildContext context) async {
+    if (_speechReady) return true;
+
+    final bool isReady = await _speechToText.initialize(
+      onError: _onSpeechError,
+    );
+
+    if (!mounted) return false;
+    setState(() {
+      _speechReady = isReady;
+    });
+
+    if (!isReady) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Không thể khởi tạo nhận diện giọng nói trên thiết bị này.'),
+        ),
+      );
+    }
+
+    return isReady;
   }
 
   @override
@@ -280,51 +312,58 @@ class _AsrNotesScreenState extends ConsumerState<AsrNotesScreen> {
             }
 
             Future<void> onToggleListening() async {
-              if (!_speechReady) {
-                await _handleMicUnavailable(context);
-                return;
-              }
+              final bool hasMicPermission = await _ensureMicrophonePermission(context);
+              if (!hasMicPermission) return;
 
               if (_isListening) {
                 await _speechToText.stop();
                 if (!mounted) return;
+                setInnerState(() => _isListening = false);
+                setState(() => _isListening = false);
+                return;
+              }
+
+              final bool ready = await _ensureSpeechReady(context);
+              if (!ready || !mounted) return;
+
+              try {
+                setInnerState(() => _isListening = true);
+                setState(() => _isListening = true);
+
+                await _speechToText.listen(
+                  localeId: 'vi_VN',
+                  listenMode: ListenMode.dictation,
+                  partialResults: true,
+                  cancelOnError: true,
+                  listenFor: const Duration(seconds: 60),
+                  pauseFor: const Duration(seconds: 8),
+                  onResult: (result) {
+                    if (!mounted) return;
+                    setInnerState(() {
+                      transcriptCtrl.text = result.recognizedWords;
+                      transcriptCtrl.selection = TextSelection.collapsed(
+                        offset: transcriptCtrl.text.length,
+                      );
+
+                      if (result.finalResult) {
+                        _isListening = false;
+                      }
+                    });
+
+                    if (result.finalResult) {
+                      setState(() => _isListening = false);
+                    }
+                  },
+                );
+              } catch (e) {
+                debugPrint('ASR Start Error: $e');
+                if (!mounted) return;
+                setInnerState(() => _isListening = false);
                 setState(() {
                   _isListening = false;
+                  _speechReady = false;
                 });
-                return;
               }
-
-              final bool available = await _speechToText.initialize();
-              if (!available) {
-                await _handleMicUnavailable(context);
-                return;
-              }
-
-              if (!mounted) return;
-              setState(() {
-                _speechReady = true;
-                _isListening = true;
-              });
-
-              await _speechToText.listen(
-                localeId: 'vi_VN',
-                listenMode: ListenMode.confirmation,
-                onResult: (result) {
-                  if (!mounted) return;
-                  setInnerState(() {
-                    transcriptCtrl.text = result.recognizedWords;
-                    transcriptCtrl.selection = TextSelection.collapsed(
-                      offset: transcriptCtrl.text.length,
-                    );
-                  });
-
-                  if (result.finalResult) {
-                    setState(() {
-                      _isListening = false;
-                    });
-                  }
-                },
-              );
             }
 
             Future<void> onSubmit() async {
@@ -343,6 +382,13 @@ class _AsrNotesScreenState extends ConsumerState<AsrNotesScreen> {
                 isSubmitting = true;
               });
 
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Đang gửi lên AI xử lý...'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+
               await vm.createNoteFromAsrInput(
                 subjectHint: subjectHint,
                 transcript: transcript,
@@ -351,7 +397,7 @@ class _AsrNotesScreenState extends ConsumerState<AsrNotesScreen> {
 
               if (!context.mounted) return;
 
-                final hasError = ref.read(notesViewModelProvider).errorMessage != null;
+              final hasError = ref.read(notesViewModelProvider).errorMessage != null;
 
               setInnerState(() {
                 isSubmitting = false;
@@ -447,6 +493,9 @@ class _AsrNotesScreenState extends ConsumerState<AsrNotesScreen> {
                           if (_isListening) {
                             await _speechToText.stop();
                             if (mounted) {
+                              setInnerState(() {
+                                _isListening = false;
+                              });
                               setState(() {
                                 _isListening = false;
                               });
