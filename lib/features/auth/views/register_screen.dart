@@ -102,8 +102,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     boxShadow: [
                       BoxShadow(
                         color: isDark
-                            ? Colors.black.withOpacity(0.35)
-                            : const Color(0xFF3949AB).withOpacity(0.08),
+                            ? Colors.black.withValues(alpha: 0.35)
+                            : const Color(0xFF3949AB).withValues(alpha: 0.08),
                         blurRadius: 24,
                         offset: const Offset(0, 8),
                       ),
@@ -161,7 +161,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             Expanded(
                                 child: Divider(
                                     color:
-                                        colorScheme.outline.withOpacity(0.2))),
+                                        colorScheme.outline.withValues(alpha: 0.2))),
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 12),
@@ -180,7 +180,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             Expanded(
                                 child: Divider(
                                     color:
-                                        colorScheme.outline.withOpacity(0.2))),
+                                        colorScheme.outline.withValues(alpha: 0.2))),
                           ],
                         ).animate().fadeIn(delay: 550.ms),
 
@@ -305,15 +305,15 @@ class _GradientButton extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: onPressed == null
               ? LinearGradient(colors: [
-                  Colors.grey.withOpacity(0.5),
-                  Colors.grey.withOpacity(0.4),
+                  Colors.grey.withValues(alpha: 0.5),
+                  Colors.grey.withValues(alpha: 0.4),
                 ])
               : AppTheme.primaryGradient,
           borderRadius: BorderRadius.circular(16),
           boxShadow: onPressed != null
               ? [
                   BoxShadow(
-                    color: const Color(0xFF3949AB).withOpacity(0.35),
+                    color: const Color(0xFF3949AB).withValues(alpha: 0.35),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   )
@@ -324,7 +324,7 @@ class _GradientButton extends StatelessWidget {
           onPressed: onPressed,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16)),
-          splashColor: Colors.white.withOpacity(0.2),
+          splashColor: Colors.white.withValues(alpha: 0.2),
           child: isLoading
               ? const SizedBox(
                   height: 22,
@@ -355,3 +355,4 @@ class _GradientButton extends StatelessWidget {
     );
   }
 }
+

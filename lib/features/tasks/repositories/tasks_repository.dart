@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -6,22 +6,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:student_academic_assistant/core/constants/firestore_constants.dart';
 import 'package:student_academic_assistant/core/services/notification_service.dart';
-import 'package:student_academic_assistant/features/notes_reminders/models/note_model.dart';
-import 'package:student_academic_assistant/features/notes_reminders/models/task_model.dart';
+import 'package:student_academic_assistant/features/tasks/models/task_model.dart';
 
-final notesRemindersRepositoryProvider = Provider<NotesRemindersRepository>((ref) {
-  return NotesRemindersRepository(
+final tasksRepositoryProvider = Provider<TasksRepository>((ref) {
+  return TasksRepository(
     firestore: FirebaseFirestore.instance,
     notificationService: ref.watch(notificationServiceProvider),
   );
 });
 
-class NotesRemindersRepository {
+class TasksRepository {
   final FirebaseFirestore _firestore;
   final NotificationService _notificationService;
   final Set<String> _migrateAttemptedDocIds = <String>{};
 
-  NotesRemindersRepository({
+  TasksRepository({
     required FirebaseFirestore firestore,
     required NotificationService notificationService,
   })  : _firestore = firestore,
@@ -44,18 +43,6 @@ class NotesRemindersRepository {
       }
 
       return tasks;
-    });
-  }
-
-  Stream<List<NoteModel>> watchNotes(String uid) {
-    return _firestore
-        .collection(FirestoreConstants.notes)
-        .where('u_id', isEqualTo: uid)
-        .snapshots()
-        .map((snapshot) {
-      final notes = snapshot.docs.map(NoteModel.fromFirestore).toList();
-      notes.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-      return notes;
     });
   }
 
@@ -103,7 +90,7 @@ class NotesRemindersRepository {
       });
     } catch (e, st) {
       debugPrint(
-        '[NotesRemindersRepository] Transaction toggle lỗi, thử fallback update. '
+        '[TasksRepository] Transaction toggle lỗi, thử fallback update. '
         'taskId=${task.id}: $e',
       );
       debugPrintStack(stackTrace: st);
@@ -152,21 +139,6 @@ class NotesRemindersRepository {
     if (_shouldScheduleReminder(newTask)) {
       await _safeScheduleTaskReminder(newTask);
     }
-  }
-
-  Future<void> addNote(NoteModel note) async {
-    await _firestore.collection(FirestoreConstants.notes).add(note.toFirestore());
-  }
-
-  Future<void> deleteNote(String noteId) async {
-    await _firestore.collection(FirestoreConstants.notes).doc(noteId).delete();
-  }
-
-  Future<void> updateNote(NoteModel note) async {
-    await _firestore
-        .collection(FirestoreConstants.notes)
-        .doc(note.id)
-        .update(note.toFirestore());
   }
 
   bool _shouldMigrateReminderId(TaskModel task) {
@@ -232,12 +204,12 @@ class NotesRemindersRepository {
       );
     } catch (e, st) {
       debugPrint(
-        '[NotesRemindersRepository] Failed to schedule notification '
+        '[TasksRepository] Failed to schedule notification '
         'for taskId=${task.id}, reminderId=${task.reminderId}: $e',
       );
       if (kIsWeb) {
         debugPrint(
-          '[NotesRemindersRepository] Running on Web: local notifications '
+          '[TasksRepository] Running on Web: local notifications '
           'are not supported by flutter_local_notifications.',
         );
       }
@@ -250,12 +222,12 @@ class NotesRemindersRepository {
       await _notificationService.cancelReminder(reminderId);
     } catch (e, st) {
       debugPrint(
-        '[NotesRemindersRepository] Failed to cancel notification '
+        '[TasksRepository] Failed to cancel notification '
         'reminderId=$reminderId: $e',
       );
       if (kIsWeb) {
         debugPrint(
-          '[NotesRemindersRepository] Running on Web: local notifications '
+          '[TasksRepository] Running on Web: local notifications '
           'are not supported by flutter_local_notifications.',
         );
       }

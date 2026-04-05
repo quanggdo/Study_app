@@ -270,12 +270,21 @@ class FirestoreQuizRepository implements QuizRepository {
 
     final questions = data['questions'];
     if (questions is List) {
-      normalized['questions'] = questions.map((q) {
+      normalized['questions'] = questions.asMap().entries.map((entry) {
+        final i = entry.key;
+        final q = entry.value;
         if (q is! Map) return q;
         final qm = q.map((k, v) => MapEntry(k.toString(), v));
 
-        // Firestore hiện tại: field question có thể là `thrilled` (typo) thay vì `question`
-        final questionText = (qm['question'] ?? qm['thrilled'] ?? '').toString();
+        final questionText = (
+          qm['question'] ??
+          qm['thrilled'] ??
+          qm['content'] ??
+          qm['text'] ??
+          qm['prompt'] ??
+          qm['title'] ??
+          ''
+        ).toString().trim();
 
         // Firestore hiện tại: danh sách lựa chọn có thể là `options` thay vì `choices`
         final rawChoices = qm['choices'] ?? qm['options'];
@@ -287,16 +296,18 @@ class FirestoreQuizRepository implements QuizRepository {
             return {
               // Firestore: `opt_id` hoặc `id` hoặc `value`
               'id': (cm['id'] ?? cm['opt_id'] ?? cm['value'] ?? '').toString(),
-              'text': (cm['text'] ?? cm['label'] ?? '').toString(),
+              'text': (cm['text'] ?? cm['label'] ?? cm['value_text'] ?? '').toString(),
             };
           }).toList();
         }
 
+        final normalizedQid = (qm['q_id'] ?? qm['qId'] ?? qm['id'] ?? '').toString().trim();
+
         return {
           ...qm,
-          // giữ chuẩn key cho app parse
-          'q_id': (qm['q_id'] ?? qm['qId'] ?? '').toString(),
-          'question': questionText,
+          // giữ chuẩn key cho app parse; fallback theo index để map review ổn định.
+          'q_id': normalizedQid.isNotEmpty ? normalizedQid : '${i + 1}',
+          'question': questionText.isNotEmpty ? questionText : 'Câu hỏi ${i + 1}',
           'choices': mappedChoices,
         };
       }).toList();

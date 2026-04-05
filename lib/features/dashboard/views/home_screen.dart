@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:student_academic_assistant/core/providers/theme_mode_provider.dart';
 import 'package:student_academic_assistant/core/providers/user_provider.dart';
 import 'package:student_academic_assistant/core/theme/app_theme.dart';
 import 'package:student_academic_assistant/core/widgets/responsive_center.dart';
@@ -35,10 +36,10 @@ class HomeScreen extends ConsumerWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                    color: Colors.white.withOpacity(0.25), width: 1),
+                    color: Colors.white.withValues(alpha: 0.25), width: 1),
               ),
               child: const Icon(Icons.school_rounded,
                   color: Colors.white, size: 18),
@@ -56,6 +57,14 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          _AppBarButton(
+            icon: isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+            tooltip: isDark ? 'Chuyển giao diện sáng' : 'Chuyển giao diện tối',
+            onPressed: () {
+              ref.read(themeModeProvider.notifier).state =
+                  isDark ? ThemeMode.light : ThemeMode.dark;
+            },
+          ),
           // Profile
           _AppBarButton(
             icon: Icons.person_rounded,
@@ -90,21 +99,6 @@ class HomeScreen extends ConsumerWidget {
 
               const SizedBox(height: 28),
 
-              // ── Quick Stats ──
-              Text(
-                'Tổng quan hôm nay',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.2,
-                    ),
-              ).animate().fadeIn(delay: 300.ms),
-
-              const SizedBox(height: 14),
-
-              _buildQuickStats(context, colorScheme, isDark),
-
-              const SizedBox(height: 28),
-
               // ── Features ──
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -125,8 +119,8 @@ class HomeScreen extends ConsumerWidget {
               _buildFeatureCard(
                 context,
                 icon: Icons.event_note_rounded,
-                title: 'Nhắc lịch & Ghi chú',
-                subtitle: 'Quản lý deadline, lên lịch và ghi chép môn học',
+                title: 'Nhắc lịch & Deadline',
+                subtitle: 'Tạo task, đặt deadline, nhận nhắc đúng giờ',
                 gradient: const LinearGradient(
                   colors: [
                     Color(0xFF1E88E5),
@@ -170,8 +164,8 @@ class HomeScreen extends ConsumerWidget {
               _buildFeatureCard(
                 context,
                 icon: Icons.mic_rounded,
-                title: 'Ghi chú thông minh',
-                subtitle: 'Ghi chú bằng giọng nói (ASR)',
+                title: 'Ghi chú giọng nói + AI',
+                subtitle: 'Nói hoặc tải audio, AI tự tóm tắt theo gạch đầu dòng',
                 gradient: const LinearGradient(
                   colors: [
                     Color(0xFF7B1FA2),
@@ -179,6 +173,8 @@ class HomeScreen extends ConsumerWidget {
                   ],
                 ),
                 delay: 610,
+                isAvailable: true,
+                onTap: () => context.push('/notes-asr'),
               ),
               // Temporary explicit card to ensure tap/navigation works
               Padding(
@@ -190,8 +186,8 @@ class HomeScreen extends ConsumerWidget {
                     boxShadow: [
                       BoxShadow(
                         color: isDark
-                            ? Colors.black.withOpacity(0.20)
-                            : const Color(0xFFE53935).withOpacity(0.08),
+                            ? Colors.black.withValues(alpha: 0.20)
+                            : const Color(0xFFE53935).withValues(alpha: 0.08),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -214,7 +210,7 @@ class HomeScreen extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(14),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFE53935).withOpacity(0.35),
+                                color: const Color(0xFFE53935).withValues(alpha: 0.35),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -225,12 +221,12 @@ class HomeScreen extends ConsumerWidget {
                         title: const Text('Pomodoro Timer', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5)),
                         subtitle: Padding(
                           padding: const EdgeInsets.only(top: 3),
-                          child: Text('Tập trung sâu & Deep Work Mode', style: TextStyle(fontSize: 12.5, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.55))),
+                          child: Text('Tập trung sâu & Deep Work Mode', style: TextStyle(fontSize: 12.5, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55))),
                         ),
                         trailing: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE53935).withOpacity(isDark ? 0.20 : 0.10),
+                            color: const Color(0xFFE53935).withValues(alpha: isDark ? 0.20 : 0.10),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFFE53935), size: 14),
@@ -270,13 +266,7 @@ class HomeScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         gradient: AppTheme.primaryGradient,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF3949AB).withOpacity(0.35),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12), width: 1),
       ),
       child: Stack(
         clipBehavior: Clip.none,
@@ -290,7 +280,7 @@ class HomeScreen extends ConsumerWidget {
               height: 90,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.07),
+                color: Colors.white.withValues(alpha: 0.03),
               ),
             ),
           ),
@@ -302,7 +292,7 @@ class HomeScreen extends ConsumerWidget {
               height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.white.withValues(alpha: 0.02),
               ),
             ),
           ),
@@ -319,9 +309,9 @@ class HomeScreen extends ConsumerWidget {
                       height: 56,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.18),
+                        color: Colors.white.withValues(alpha: 0.18),
                         border: Border.all(
-                            color: Colors.white.withOpacity(0.35), width: 2),
+                            color: Colors.white.withValues(alpha: 0.35), width: 2),
                       ),
                       clipBehavior: Clip.antiAlias,
                       child: user?.photoUrl != null &&
@@ -347,7 +337,7 @@ class HomeScreen extends ConsumerWidget {
                         Text(
                           'Xin chào,',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.75),
+                            color: Colors.white.withValues(alpha: 0.75),
                             fontSize: 13,
                           ),
                         ),
@@ -370,10 +360,10 @@ class HomeScreen extends ConsumerWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
+                      color: Colors.white.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                          color: Colors.white.withOpacity(0.25), width: 1),
+                          color: Colors.white.withValues(alpha: 0.25), width: 1),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -397,21 +387,21 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               Container(
                 height: 1,
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha: 0.15),
               ),
               const SizedBox(height: 14),
               Text(
                 user?.email ?? '',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.65),
+                  color: Colors.white.withValues(alpha: 0.65),
                   fontSize: 12,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                '"Học không bao giờ là muộn — mỗi ngày là một cơ hội mới."',
+                '"Hãy bắt đầu 1 ngày học tập thật hiệu quả nào!"',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.80),
+                  color: Colors.white.withValues(alpha: 0.80),
                   fontSize: 12.5,
                   fontStyle: FontStyle.italic,
                   height: 1.5,
@@ -422,84 +412,6 @@ class HomeScreen extends ConsumerWidget {
         ],
       ),
     ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.05);
-  }
-
-  Widget _buildQuickStats(
-      BuildContext context, ColorScheme colorScheme, bool isDark) {
-    final stats = [
-      const _StatItem(
-          icon: Icons.local_fire_department_rounded,
-          label: 'Streak',
-          value: '0 ngày',
-          color: Colors.orange),
-      const _StatItem(
-          icon: Icons.timer_rounded,
-          label: 'Đã học',
-          value: '0 phút',
-          color: Color(0xFF3949AB)),
-      const _StatItem(
-          icon: Icons.task_alt_rounded,
-          label: 'Task',
-          value: '0/0',
-          color: Colors.green),
-    ];
-
-    return Row(
-      children: stats.asMap().entries.map((entry) {
-        final stat = entry.value;
-        final delay = 350 + entry.key * 80;
-        return Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(right: entry.key < stats.length - 1 ? 10 : 0),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1C1F2E) : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: isDark
-                        ? Colors.black.withOpacity(0.25)
-                        : const Color(0xFF3949AB).withOpacity(0.06),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: stat.color.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(stat.icon, color: stat.color, size: 18),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    stat.value,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.2,
-                        ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    stat.label,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                  ),
-                ],
-              ),
-            ).animate().fadeIn(delay: Duration(milliseconds: delay)).slideY(begin: 0.06),
-          ),
-        );
-      }).toList(),
-    );
   }
 
   Widget _buildFeatureCard(
@@ -524,8 +436,8 @@ class HomeScreen extends ConsumerWidget {
           boxShadow: [
             BoxShadow(
               color: isDark
-                  ? Colors.black.withOpacity(0.20)
-                  : baseColor.withOpacity(0.08),
+                  ? Colors.black.withValues(alpha: 0.20)
+                  : baseColor.withValues(alpha: 0.08),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -547,7 +459,7 @@ class HomeScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: baseColor.withOpacity(0.35),
+                      color: baseColor.withValues(alpha: 0.35),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -568,7 +480,7 @@ class HomeScreen extends ConsumerWidget {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withOpacity(0.55),
+                        .withValues(alpha: 0.55),
                   ),
                 ),
               ),
@@ -576,7 +488,7 @@ class HomeScreen extends ConsumerWidget {
                   ? Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: baseColor.withOpacity(0.1),
+                        color: baseColor.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(Icons.arrow_forward_ios_rounded,
@@ -586,7 +498,7 @@ class HomeScreen extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: baseColor.withOpacity(isDark ? 0.20 : 0.10),
+                        color: baseColor.withValues(alpha: isDark ? 0.20 : 0.10),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -650,24 +562,6 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-// =============================================================================
-// Helper classes
-// =============================================================================
-
-class _StatItem {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color color;
-
-  const _StatItem({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
-}
-
 class _AppBarButton extends StatelessWidget {
   final IconData icon;
   final String tooltip;
@@ -688,10 +582,10 @@ class _AppBarButton extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.12),
+            color: Colors.white.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-                color: Colors.white.withOpacity(0.20), width: 1),
+                color: Colors.white.withValues(alpha: 0.20), width: 1),
           ),
           child: Icon(icon, color: Colors.white, size: 18),
         ),
@@ -700,3 +594,4 @@ class _AppBarButton extends StatelessWidget {
     );
   }
 }
+

@@ -32,6 +32,10 @@
 	<string>Ứng dụng cần quyền thư viện ảnh để chọn ảnh thời khóa biểu.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Ứng dụng cần quyền lưu ảnh nếu bạn muốn lưu ảnh đã xử lý.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Ứng dụng cần microphone để nhận diện giọng nói khi tạo ghi chú.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Ứng dụng cần nhận diện giọng nói để chuyển lời nói thành ghi chú.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

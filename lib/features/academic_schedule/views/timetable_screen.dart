@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../core/providers/user_provider.dart';
 import '../../../core/widgets/responsive_center.dart';
@@ -9,6 +10,47 @@ import '../viewmodels/schedule_viewmodel.dart';
 
 class TimetableScreen extends ConsumerWidget {
   const TimetableScreen({super.key});
+
+  Future<bool> _ensureCameraPermission(BuildContext context) async {
+    final PermissionStatus currentStatus = await Permission.camera.status;
+    if (currentStatus.isGranted || currentStatus.isLimited) {
+      return true;
+    }
+
+    final PermissionStatus requestedStatus = await Permission.camera.request();
+    if (requestedStatus.isGranted || requestedStatus.isLimited) {
+      return true;
+    }
+
+    if (!context.mounted) return false;
+
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Cần quyền camera'),
+          content: const Text(
+            'Bạn cần cấp quyền camera để chụp ảnh thời khóa biểu. Bạn có thể mở Cài đặt để bật quyền.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Để sau'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                Navigator.pop(dialogContext);
+                await openAppSettings();
+              },
+              child: const Text('Mở cài đặt'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return false;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -202,6 +244,12 @@ class TimetableScreen extends ConsumerWidget {
                   subtitle: const Text('Hữu ích khi chạy trên điện thoại'),
                   onTap: () async {
                     Navigator.pop(ctx);
+
+                    final bool canUseCamera =
+                        await _ensureCameraPermission(context);
+                    if (!canUseCamera) {
+                      return;
+                    }
 
                     bool replaceExisting = false;
                     if (existingSessions.isNotEmpty) {

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 /// A styled [TextFormField] used across all authentication screens.
 ///
@@ -58,14 +58,14 @@ class AuthTextField extends StatelessWidget {
         labelText: label,
         hintText: hint,
         hintStyle: TextStyle(
-          color: colorScheme.onSurface.withOpacity(0.38),
+          color: colorScheme.onSurface.withValues(alpha: 0.38),
           fontWeight: FontWeight.w400,
         ),
         prefixIcon: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           child: Icon(
             prefixIcon,
-            color: colorScheme.primary.withOpacity(0.75),
+            color: colorScheme.primary.withValues(alpha: 0.75),
             size: 22,
           ),
         ),
@@ -79,7 +79,7 @@ class AuthTextField extends StatelessWidget {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: colorScheme.outline.withOpacity(isDark ? 0.25 : 0.20),
+            color: colorScheme.outline.withValues(alpha: isDark ? 0.25 : 0.20),
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -100,8 +100,8 @@ class AuthTextField extends StatelessWidget {
         // Fill
         filled: true,
         fillColor: isDark
-            ? colorScheme.surfaceContainerHighest.withOpacity(0.45)
-            : colorScheme.primary.withOpacity(0.04),
+            ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.45)
+            : colorScheme.primary.withValues(alpha: 0.04),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
         // Label styling
@@ -114,3 +114,4 @@ class AuthTextField extends StatelessWidget {
     );
   }
 }
+

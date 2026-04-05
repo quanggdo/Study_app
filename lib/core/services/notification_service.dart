@@ -63,8 +63,8 @@ class NotificationService {
         alarmStyle ? 'study_alarm_channel' : 'study_reminder_channel',
         alarmStyle ? 'Study Alarm' : 'Study Reminder',
         channelDescription: alarmStyle
-            ? 'Thong bao kieu bao thuc cho deadline quan trong'
-            : 'Nhac lich hoc va deadline',
+          ? 'Thông báo kiểu báo thức cho deadline quan trọng'
+          : 'Nhắc lịch học và deadline',
         importance: Importance.max,
         priority: Priority.high,
         fullScreenIntent: alarmStyle,

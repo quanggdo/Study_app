@@ -98,8 +98,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     boxShadow: [
                       BoxShadow(
                         color: isDark
-                            ? Colors.black.withOpacity(0.35)
-                            : const Color(0xFF3949AB).withOpacity(0.08),
+                            ? Colors.black.withValues(alpha: 0.35)
+                            : const Color(0xFF3949AB).withValues(alpha: 0.08),
                         blurRadius: 24,
                         offset: const Offset(0, 8),
                       ),
@@ -217,7 +217,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             Expanded(
                                 child: Divider(
                                     color: colorScheme.outline
-                                        .withOpacity(0.25))),
+                                        .withValues(alpha: 0.25))),
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16),
@@ -228,7 +228,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     .labelSmall
                                     ?.copyWith(
                                       color:
-                                          colorScheme.onSurface.withOpacity(0.4),
+                                          colorScheme.onSurface.withValues(alpha: 0.4),
                                       letterSpacing: 1.5,
                                     ),
                               ),
@@ -236,7 +236,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             Expanded(
                                 child: Divider(
                                     color: colorScheme.outline
-                                        .withOpacity(0.25))),
+                                        .withValues(alpha: 0.25))),
                           ],
                         ).animate().fadeIn(delay: 800.ms),
 
@@ -304,8 +304,8 @@ class _GradientButton extends StatelessWidget {
           gradient: onPressed == null
               ? LinearGradient(
                   colors: [
-                    Colors.grey.withOpacity(0.5),
-                    Colors.grey.withOpacity(0.4),
+                    Colors.grey.withValues(alpha: 0.5),
+                    Colors.grey.withValues(alpha: 0.4),
                   ],
                 )
               : AppTheme.primaryGradient,
@@ -313,7 +313,7 @@ class _GradientButton extends StatelessWidget {
           boxShadow: onPressed != null
               ? [
                   BoxShadow(
-                    color: const Color(0xFF3949AB).withOpacity(0.35),
+                    color: const Color(0xFF3949AB).withValues(alpha: 0.35),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   )
@@ -324,7 +324,7 @@ class _GradientButton extends StatelessWidget {
           onPressed: onPressed,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16)),
-          splashColor: Colors.white.withOpacity(0.2),
+          splashColor: Colors.white.withValues(alpha: 0.2),
           child: isLoading
               ? const SizedBox(
                   height: 22,

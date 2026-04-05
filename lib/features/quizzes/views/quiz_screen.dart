@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 
 import '../viewmodels/quiz_viewmodel.dart';
 import 'widgets/quiz_loading_shimmer.dart';
@@ -23,6 +24,37 @@ class QuizScreen extends ConsumerWidget {
     if (endAt == null) return 0;
     final diff = endAt.difference(DateTime.now()).inSeconds;
     return diff < 0 ? 0 : diff;
+  }
+
+  Future<bool> _confirmExitQuiz(BuildContext context) async {
+    final shouldExit = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text('Thoát bài làm?'),
+            content: const Text('Bạn có chắc muốn thoát không? Tiến trình làm bài hiện tại sẽ bị hủy.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Không'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Có'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+      if (!context.mounted) return false;
+
+    if (!shouldExit) return false;
+
+    context.go('/home');
+    return false;
   }
 
   @override
@@ -95,15 +127,23 @@ class QuizScreen extends ConsumerWidget {
 
     return _QuizScreenLifecycle(
       onResume: vm.refreshRemaining,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(quiz.title),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+      child: WillPopScope(
+        onWillPop: () => _confirmExitQuiz(context),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(quiz.title),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              onPressed: () async {
+                await _confirmExitQuiz(context);
+              },
+            ),
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               if (state.timeUp)
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -187,7 +227,9 @@ class QuizScreen extends ConsumerWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    q.question,
+                    q.question.trim().isNotEmpty
+                        ? q.question
+                        : 'Câu hỏi ${state.index + 1}',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
@@ -390,7 +432,8 @@ class QuizScreen extends ConsumerWidget {
                   ],
                 ],
               ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -596,7 +639,8 @@ class _QuizResultView extends StatelessWidget {
                 itemBuilder: (context, i) {
                   final q = questions[i] as dynamic;
                   final qId = q.qId as String;
-                  final qText = q.question as String;
+                  final qTextRaw = (q.question ?? '').toString().trim();
+                  final qText = qTextRaw.isNotEmpty ? qTextRaw : 'Câu hỏi ${i + 1}';
                   final choices = q.choices as List;
 
                   final item = reviewByQId[qId] as dynamic;
@@ -767,133 +811,137 @@ class _QuestionOverviewSheet extends StatelessWidget {
     Color answeredColor = Theme.of(context).colorScheme.secondary;
 
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Tổng quan câu hỏi',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '$title • $unanswered câu chưa trả lời',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 8,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final crossAxisCount = constraints.maxWidth < 420 ? 4 : 5;
+
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
+                Text(
+                  'Tổng quan câu hỏi',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$title • $unanswered câu chưa trả lời',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
                   children: [
-                    legendDot(currentColor),
-                    const SizedBox(width: 6),
-                    const Text('Đang làm'),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        legendDot(currentColor),
+                        const SizedBox(width: 6),
+                        const Text('Đang làm'),
+                      ],
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        legendDot(answeredColor.withValues(alpha: 0.35)),
+                        const SizedBox(width: 6),
+                        const Text('Đã trả lời'),
+                      ],
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        legendDot(Theme.of(context).colorScheme.surfaceContainerHighest),
+                        const SizedBox(width: 6),
+                        const Text('Chưa trả lời'),
+                      ],
+                    ),
                   ],
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    legendDot(answeredColor.withValues(alpha: 0.35)),
-                    const SizedBox(width: 6),
-                    const Text('Đã trả lời'),
-                  ],
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    legendDot(Theme.of(context).colorScheme.surfaceContainerHighest),
-                    const SizedBox(width: 6),
-                    const Text('Chưa trả lời'),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Flexible(
-              child: GridView.builder(
-                shrinkWrap: true,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 5,
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                  childAspectRatio: 1.25,
-                ),
-                itemCount: total,
-                itemBuilder: (context, i) {
-                  final qId = qIds[i];
-                  final isCurrent = i == currentIndex;
-                  final isAnswered = answeredQIds.contains(qId);
+                const SizedBox(height: 12),
+                Expanded(
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: 1.15,
+                    ),
+                    itemCount: total,
+                    itemBuilder: (context, i) {
+                      final qId = qIds[i];
+                      final isCurrent = i == currentIndex;
+                      final isAnswered = answeredQIds.contains(qId);
 
-                  Color bg;
-                  Color fg;
-                  Color border;
+                      Color bg;
+                      Color fg;
+                      Color border;
 
-                  if (isCurrent) {
-                    bg = Theme.of(context).colorScheme.primary;
-                    fg = Theme.of(context).colorScheme.onPrimary;
-                    border = Theme.of(context).colorScheme.primary;
-                  } else if (isAnswered) {
-                    bg = Theme.of(context)
-                        .colorScheme
-                        .secondaryContainer
-                        .withValues(alpha: 0.9);
-                    fg = Theme.of(context).colorScheme.onSecondaryContainer;
-                    border = Theme.of(context).colorScheme.secondary;
-                  } else {
-                    bg = Theme.of(context).colorScheme.surfaceContainerHighest;
-                    fg = Theme.of(context).colorScheme.onSurface;
-                    border = Theme.of(context).dividerColor;
-                  }
+                      if (isCurrent) {
+                        bg = Theme.of(context).colorScheme.primary;
+                        fg = Theme.of(context).colorScheme.onPrimary;
+                        border = Theme.of(context).colorScheme.primary;
+                      } else if (isAnswered) {
+                        bg = Theme.of(context)
+                            .colorScheme
+                            .secondaryContainer
+                            .withValues(alpha: 0.9);
+                        fg = Theme.of(context).colorScheme.onSecondaryContainer;
+                        border = Theme.of(context).colorScheme.secondary;
+                      } else {
+                        bg = Theme.of(context).colorScheme.surfaceContainerHighest;
+                        fg = Theme.of(context).colorScheme.onSurface;
+                        border = Theme.of(context).dividerColor;
+                      }
 
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(14),
-                    onTap: () => onJump(i),
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: bg,
+                      return InkWell(
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: border),
-                      ),
-                      child: Text(
-                        '${i + 1}',
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: fg,
-                            ),
-                      ),
-                    ).animate().fadeIn(duration: 180.ms, delay: (15 * i).ms),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: unanswered > 0 ? onJumpFirstUnanswered : null,
-                    icon: const Icon(Icons.flag_outlined),
-                    label: const Text('Tới câu chưa làm'),
+                        onTap: () => onJump(i),
+                        child: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: bg,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: border),
+                          ),
+                          child: Text(
+                            '${i + 1}',
+                            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: fg,
+                                ),
+                          ),
+                        ).animate().fadeIn(duration: 180.ms, delay: (15 * i).ms),
+                      );
+                    },
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.check_rounded),
-                    label: const Text('Đóng'),
-                  ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: unanswered > 0 ? onJumpFirstUnanswered : null,
+                        icon: const Icon(Icons.flag_outlined),
+                        label: const Text('Tới câu chưa làm'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.check_rounded),
+                        label: const Text('Đóng'),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

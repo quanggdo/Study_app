@@ -11,35 +11,45 @@ class ReviewSessionScreen extends ConsumerWidget {
     super.key,
     required this.deckId,
     required this.deckTitle,
+    this.includeAllCards = false,
   });
 
   final String deckId;
   final String deckTitle;
+  final bool includeAllCards;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final session = ref.watch(reviewSessionProvider(deckId));
-    final vm = ref.read(reviewSessionProvider(deckId).notifier);
+    final params = ReviewSessionParams(
+      deckId: deckId,
+      includeAllCards: includeAllCards,
+    );
+    final session = ref.watch(reviewSessionProvider(params));
+    final vm = ref.read(reviewSessionProvider(params).notifier);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ôn tập • $deckTitle'),
+        title: Text(
+          includeAllCards
+              ? 'Ôn tất cả • $deckTitle'
+              : 'Ôn đến hạn • $deckTitle',
+        ),
       ),
       body: session.loading
           ? const Center(child: CircularProgressIndicator())
           : session.error != null
               ? Center(child: Text('Lỗi: ${session.error}'))
               : session.current == null
-                  ? _DoneView(total: session.total)
+                  ? _DoneView(reviewed: session.reviewedCount, total: session.total)
                   : Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           _ProgressHeader(
-                            index: session.index,
+                            reviewed: session.reviewedCount,
                             total: session.total,
-                            remaining: session.items.length,
+                            remaining: session.remaining,
                           ),
                           if (session.lastScheduledMessage != null) ...[
                             const SizedBox(height: 8),
@@ -148,12 +158,12 @@ class _ScheduleHint extends StatelessWidget {
 
 class _ProgressHeader extends StatelessWidget {
   const _ProgressHeader({
-    required this.index,
+    required this.reviewed,
     required this.total,
     required this.remaining,
   });
 
-  final int index;
+  final int reviewed;
   final int total;
   final int remaining;
 
@@ -163,7 +173,7 @@ class _ProgressHeader extends StatelessWidget {
       children: [
         Text('Đến hạn: $remaining thẻ'),
         const Spacer(),
-        Text('Tiến độ: ${min(index + 1, max(1, total))}/$total'),
+        Text('Đã chấm: $reviewed/$total'),
       ],
     );
   }
@@ -322,8 +332,9 @@ class _GradeBar extends StatelessWidget {
 }
 
 class _DoneView extends StatelessWidget {
-  const _DoneView({required this.total});
+  const _DoneView({required this.reviewed, required this.total});
 
+  final int reviewed;
   final int total;
 
   @override
@@ -340,7 +351,7 @@ class _DoneView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            Text('Bạn đã ôn $total thẻ.'),
+            Text('Bạn đã ôn $reviewed/$total thẻ.'),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(),

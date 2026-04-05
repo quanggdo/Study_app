@@ -1,4 +1,4 @@
-import 'dart:math' as math;
+﻿import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -32,7 +32,7 @@ class AuthHeader extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // ── Decorative circles ──
+          // â”€â”€ Decorative circles â”€â”€
           Positioned(
             right: -20,
             top: -20,
@@ -49,7 +49,7 @@ class AuthHeader extends StatelessWidget {
             child: _DecorCircle(size: 100, opacity: 0.05),
           ),
 
-          // ── Content ──
+          // â”€â”€ Content â”€â”€
           SafeArea(
             bottom: false,
             child: Column(
@@ -60,15 +60,15 @@ class AuthHeader extends StatelessWidget {
                   width: 64,
                   height: 64,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.12),
+                    color: Colors.white.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.20),
+                      color: Colors.white.withValues(alpha: 0.20),
                       width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.white.withOpacity(0.08),
+                        color: Colors.white.withValues(alpha: 0.08),
                         blurRadius: 20,
                         spreadRadius: 4,
                       ),
@@ -104,7 +104,7 @@ class AuthHeader extends StatelessWidget {
                 Text(
                   subtitle,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withOpacity(0.78),
+                        color: Colors.white.withValues(alpha: 0.78),
                         height: 1.4,
                       ),
                 ).animate().fadeIn(delay: 300.ms).slideX(begin: -0.05),
@@ -131,7 +131,7 @@ class _DecorCircle extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white.withOpacity(opacity),
+        color: Colors.white.withValues(alpha: opacity),
       ),
     );
   }
@@ -142,7 +142,7 @@ class _StarburstPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.03)
+      ..color = Colors.white.withValues(alpha: 0.03)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
@@ -166,3 +166,4 @@ class _StarburstPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
