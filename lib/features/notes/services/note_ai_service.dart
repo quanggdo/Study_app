@@ -6,9 +6,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
+import '../../../secret.dart';
+
 class NoteAiService {
   static const String _modelName = 'gemini-2.5-flash';
-  static const String _apiKey = String.fromEnvironment('GEMINI_API_KEY');
+  static const String _apiKey = GEMINI_API_KEY;
 
   Future<NoteAiResult> buildNoteFromTranscript({
     required String transcript,
@@ -61,17 +63,10 @@ class NoteAiService {
     required String? audioMimeType,
     required Uint8List? audioBytes,
   }) async {
-    final String apiKey = _apiKey;
-    if (apiKey.isEmpty) {
-      throw Exception(
-        'Thiếu GEMINI_API_KEY. Hãy chạy app với --dart-define=GEMINI_API_KEY=...',
-      );
-    }
-
     try {
       final GenerativeModel model = GenerativeModel(
         model: _modelName,
-        apiKey: apiKey,
+        apiKey: _apiKey,
       );
 
       final List<Part> parts = <Part>[TextPart(prompt)];
