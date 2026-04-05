@@ -156,7 +156,9 @@ class TasksViewModel extends StateNotifier<TasksState> {
             .toList();
         state = state.copyWith(tasks: syncedTasks);
       }
-      // Invalidate quiz stats provider để refresh task completion percentage
+      // Invalidate tất cả providers để refresh dashboard + hôm nay stats
+      _ref.invalidate(dashboardStatsProvider);
+      _ref.invalidate(studyTimeStatsProvider);
       _ref.invalidate(quizStatsProvider);
     } catch (e, st) {
       debugPrint('toggleTask error: $e');
@@ -190,7 +192,9 @@ class TasksViewModel extends StateNotifier<TasksState> {
         newTask: reactivatedTask,
       );
       state = state.copyWith(isLoading: false);
-      // Invalidate quiz stats provider để refresh data
+      // Invalidate tất cả providers để refresh dashboard + hôm nay stats
+      _ref.invalidate(dashboardStatsProvider);
+      _ref.invalidate(studyTimeStatsProvider);
       _ref.invalidate(quizStatsProvider);
       return true;
     } catch (_) {
