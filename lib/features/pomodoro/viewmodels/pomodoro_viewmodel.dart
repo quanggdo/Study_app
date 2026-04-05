@@ -58,7 +58,7 @@ class PomodoroViewModel extends StateNotifier<PomodoroState> {
       _saveSessionElapsed(elapsed);
     }
     _timer?.cancel();
-    state = state.copyWith(remainingSeconds: state.totalSeconds, status: PomodoroStatus.finished);
+    state = state.copyWith(remainingSeconds: state.totalSeconds, status: PomodoroStatus.ready);
   }
 
   Future<void> _saveSessionElapsed(int seconds) async {

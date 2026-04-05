@@ -5,21 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../secret.dart';
 import '../models/class_session_model.dart';
 
 class ScheduleAiService {
   static const String _modelCandidates = 'gemini-2.5-flash';
-  static const String _apiKey = String.fromEnvironment('GEMINI_API_KEY');
-  //'
+  static const String _apiKey = GEMINI_API_KEY;
 
   Future<ScheduleAiResult> extractScheduleFromImage(XFile imageFile) async {
-    final String apiKey = _apiKey;
-    if (apiKey.isEmpty) {
-      throw Exception(
-        'Thiếu GEMINI_API_KEY. Hãy chạy app với --dart-define=GEMINI_API_KEY=... ',
-      );
-    }
-
     final Uint8List bytes = await imageFile.readAsBytes();
     final String mimeType = _guessMimeType(imageFile.name);
 
@@ -44,7 +37,7 @@ Chỉ trả về JSON, không dùng markdown.
 ''';
 
     final GenerateContentResponse response = await _generateWithFallback(
-      apiKey: apiKey,
+      apiKey: _apiKey,
       prompt: prompt,
       mimeType: mimeType,
       bytes: bytes,
