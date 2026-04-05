@@ -11,6 +11,7 @@ import 'package:video_player/video_player.dart';
 import 'package:vibration/vibration.dart';
 
 import '../models/pomodoro_state.dart';
+import '../services/audio_service.dart';
 import '../viewmodels/pomodoro_viewmodel.dart';
 
 class PomodoroScreen extends ConsumerStatefulWidget {
@@ -24,6 +25,14 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> with SingleTick
   VideoPlayerController? _videoController;
   bool _videoReady = false;
   bool _showGreatJob = false;
+  final _audioService = PomodoroAudioService();
+
+  @override
+  void dispose() {
+    _videoController?.dispose();
+    _audioService.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -128,12 +137,6 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> with SingleTick
         );
       },
     );
-  }
-
-  @override
-  void dispose() {
-    _videoController?.dispose();
-    super.dispose();
   }
 
   // @override
@@ -300,6 +303,10 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> with SingleTick
         if (next.status == PomodoroStatus.finished) {
           // stop and reset video, show animation
           await _stopAndResetVideo();
+          
+          // phát âm thanh hoàn thành
+          await _audioService.playCompletionSound();
+          
           // vibrate and play short alert sound
           try {
             if (await Vibration.hasVibrator() ?? false) {

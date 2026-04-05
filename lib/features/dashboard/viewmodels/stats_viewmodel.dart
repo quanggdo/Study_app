@@ -24,3 +24,9 @@ final quizStatsProvider = FutureProvider<QuizStatsData>((ref) async {
   final repository = ref.watch(dashboardRepositoryProvider);
   return repository.getQuizStats();
 });
+
+/// Provider cho mục tiêu thời gian học hàng ngày
+final targetStudyTimeProvider = FutureProvider<int>((ref) async {
+  final repository = ref.watch(dashboardRepositoryProvider);
+  return repository.getTargetStudyTime();
+});

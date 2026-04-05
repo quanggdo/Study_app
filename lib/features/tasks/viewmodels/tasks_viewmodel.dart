@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:student_academic_assistant/core/providers/user_provider.dart';
+import 'package:student_academic_assistant/features/dashboard/viewmodels/stats_viewmodel.dart';
 import 'package:student_academic_assistant/features/tasks/models/task_model.dart';
 import 'package:student_academic_assistant/features/tasks/repositories/tasks_repository.dart';
 
@@ -155,6 +156,8 @@ class TasksViewModel extends StateNotifier<TasksState> {
             .toList();
         state = state.copyWith(tasks: syncedTasks);
       }
+      // Invalidate quiz stats provider để refresh task completion percentage
+      _ref.invalidate(quizStatsProvider);
     } catch (e, st) {
       debugPrint('toggleTask error: $e');
       debugPrintStack(stackTrace: st);
@@ -187,6 +190,8 @@ class TasksViewModel extends StateNotifier<TasksState> {
         newTask: reactivatedTask,
       );
       state = state.copyWith(isLoading: false);
+      // Invalidate quiz stats provider để refresh data
+      _ref.invalidate(quizStatsProvider);
       return true;
     } catch (_) {
       state = state.copyWith(
