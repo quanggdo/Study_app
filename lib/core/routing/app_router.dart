@@ -11,7 +11,8 @@ import 'package:student_academic_assistant/features/auth/views/register_screen.d
 import 'package:student_academic_assistant/features/dashboard/views/home_screen.dart';
 import 'package:student_academic_assistant/features/dashboard/views/study_hub_screen.dart';
 import 'package:student_academic_assistant/features/academic_schedule/views/timetable_screen.dart';
-import 'package:student_academic_assistant/features/notes_reminders/views/notes_reminders_screen.dart';
+import 'package:student_academic_assistant/features/notes/views/asr_notes_screen.dart';
+import 'package:student_academic_assistant/features/tasks/views/tasks_screen.dart';
 import 'package:student_academic_assistant/features/flashcards/views/flashcards_screen.dart';
 import 'package:student_academic_assistant/features/quizzes/views/quiz_screen.dart';
 import 'package:student_academic_assistant/features/quizzes/views/quiz_list_screen.dart';
@@ -88,7 +89,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/tasks',
-        builder: (context, state) => const NotesRemindersScreen(),
+        builder: (context, state) => const TasksScreen(),
+      ),
+      GoRoute(
+        path: '/notes-asr',
+        builder: (context, state) => const AsrNotesScreen(),
       ),
       GoRoute(
         path: '/flashcards',

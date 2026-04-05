@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:student_academic_assistant/core/providers/user_provider.dart';
 import 'package:student_academic_assistant/features/auth/viewmodels/auth_viewmodel.dart';
@@ -63,7 +64,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   color: Theme.of(context)
                       .colorScheme
                       .outline
-                      .withOpacity(0.3),
+                      .withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -115,6 +116,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     if (source == null) return;
 
+    if (source == ImageSource.camera) {
+      final bool canUseCamera = await _ensureCameraPermission();
+      if (!canUseCamera) {
+        return;
+      }
+    }
+
     final picked = await picker.pickImage(
       source: source,
       maxWidth: 512,
@@ -129,6 +137,47 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         _hasChanges = true;
       });
     }
+  }
+
+  Future<bool> _ensureCameraPermission() async {
+    final PermissionStatus currentStatus = await Permission.camera.status;
+    if (currentStatus.isGranted || currentStatus.isLimited) {
+      return true;
+    }
+
+    final PermissionStatus requestedStatus = await Permission.camera.request();
+    if (requestedStatus.isGranted || requestedStatus.isLimited) {
+      return true;
+    }
+
+    if (!mounted) return false;
+
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Cần quyền camera'),
+          content: const Text(
+            'Bạn cần cấp quyền camera để chụp ảnh đại diện. Bạn có thể mở Cài đặt để bật quyền.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Để sau'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                Navigator.pop(dialogContext);
+                await openAppSettings();
+              },
+              child: const Text('Mở cài đặt'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return false;
   }
 
   Future<void> _saveProfile() async {
@@ -209,7 +258,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               icon: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child:
@@ -241,7 +290,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                     ),
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.white.withOpacity(0.2),
+                      backgroundColor: Colors.white.withValues(alpha: 0.2),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -276,7 +325,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                   width: 3,
                                 ),
                               ),
@@ -299,7 +348,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
+                                      color: Colors.black.withValues(alpha: 0.2),
                                       blurRadius: 6,
                                     ),
                                   ],
@@ -332,7 +381,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       Text(
                         user.email,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                             ),
                       ).animate().fadeIn(delay: 300.ms),
                     ],
@@ -520,11 +569,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
           return Container(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             child: Center(
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 value: loadingProgress.expectedTotalBytes != null
                     ? loadingProgress.cumulativeBytesLoaded /
                         loadingProgress.expectedTotalBytes!
@@ -536,11 +585,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         errorBuilder: (context, error, stackTrace) {
           debugPrint('Avatar load error: $error');
           return Container(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             child: Icon(
               Icons.person_rounded,
               size: 50,
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
             ),
           );
         },
@@ -549,11 +598,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     // 3. Default icon
     return Container(
-      color: Colors.white.withOpacity(0.2),
+      color: Colors.white.withValues(alpha: 0.2),
       child: Icon(
         Icons.person_rounded,
         size: 50,
-        color: Colors.white.withOpacity(0.8),
+        color: Colors.white.withValues(alpha: 0.8),
       ),
     );
   }
@@ -566,7 +615,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: colorScheme.primary.withOpacity(0.1),
+            color: colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, size: 20, color: colorScheme.primary),
@@ -603,7 +652,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       validator: validator,
       style: TextStyle(
         color: readOnly
-            ? colorScheme.onSurface.withOpacity(0.5)
+            ? colorScheme.onSurface.withValues(alpha: 0.5)
             : colorScheme.onSurface,
       ),
       decoration: InputDecoration(
@@ -613,8 +662,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         prefixIcon: Icon(icon),
         filled: true,
         fillColor: readOnly
-            ? colorScheme.surfaceContainerHighest.withOpacity(0.5)
-            : colorScheme.surfaceContainerHighest.withOpacity(0.3),
+            ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+            : colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -622,7 +671,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide:
-              BorderSide(color: colorScheme.outline.withOpacity(0.15)),
+              BorderSide(color: colorScheme.outline.withValues(alpha: 0.15)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -696,3 +745,4 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 }
+

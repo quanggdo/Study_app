@@ -1,61 +1,86 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:student_academic_assistant/core/providers/user_provider.dart';
-import 'package:student_academic_assistant/features/notes_reminders/models/note_model.dart';
-import 'package:student_academic_assistant/features/notes_reminders/models/task_model.dart';
-import 'package:student_academic_assistant/features/notes_reminders/repositories/notes_reminders_repository.dart';
+import 'package:student_academic_assistant/features/tasks/models/task_model.dart';
+import 'package:student_academic_assistant/features/tasks/repositories/tasks_repository.dart';
 
-class NotesRemindersState {
+class TasksState {
   final List<TaskModel> tasks;
-  final List<NoteModel> notes;
   final bool isLoading;
   final String? errorMessage;
 
-  const NotesRemindersState({
+  const TasksState({
     this.tasks = const [],
-    this.notes = const [],
     this.isLoading = false,
     this.errorMessage,
   });
 
-  NotesRemindersState copyWith({
+  TasksState copyWith({
     List<TaskModel>? tasks,
-    List<NoteModel>? notes,
     bool? isLoading,
     String? errorMessage,
   }) {
-    return NotesRemindersState(
+    return TasksState(
       tasks: tasks ?? this.tasks,
-      notes: notes ?? this.notes,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
     );
   }
 }
 
-class NotesRemindersViewModel extends StateNotifier<NotesRemindersState> {
+class TasksViewModel extends StateNotifier<TasksState> {
   final Ref _ref;
-  final NotesRemindersRepository _repository;
+  final TasksRepository _repository;
   final Set<String> _processingTaskIds = <String>{};
   StreamSubscription<List<TaskModel>>? _tasksSub;
-  StreamSubscription<List<NoteModel>>? _notesSub;
 
-  NotesRemindersViewModel(this._ref, this._repository)
-      : super(const NotesRemindersState()) {
-    _listenData();
+  TasksViewModel(this._ref, this._repository) : super(const TasksState()) {
+    _listenAuthChanges();
+    _listenTasks();
   }
 
-  void _listenData() {
+  void _listenAuthChanges() {
+    _ref.listen(currentUserProvider, (previous, next) {
+      final String? previousUid = previous?.uid;
+      final String? nextUid = next?.uid;
+
+      if (previousUid == nextUid) {
+        return;
+      }
+
+      if (nextUid == null) {
+        _tasksSub?.cancel();
+        _tasksSub = null;
+        state = state.copyWith(
+          tasks: const <TaskModel>[],
+          isLoading: false,
+          errorMessage: null,
+        );
+        return;
+      }
+
+      _bindTasksStream(nextUid);
+    });
+  }
+
+  void _listenTasks() {
     final user = _ref.read(currentUserProvider);
-    if (user == null) return;
+    if (user == null) {
+      _tasksSub?.cancel();
+      _tasksSub = null;
+      state = state.copyWith(tasks: const <TaskModel>[]);
+      return;
+    }
 
+    _bindTasksStream(user.uid);
+  }
+
+  void _bindTasksStream(String uid) {
     _tasksSub?.cancel();
-    _notesSub?.cancel();
-
-    _tasksSub = _repository.watchTasks(user.uid).listen(
+    _tasksSub = _repository.watchTasks(uid).listen(
       (tasks) {
         state = state.copyWith(tasks: tasks);
       },
@@ -66,26 +91,15 @@ class NotesRemindersViewModel extends StateNotifier<NotesRemindersState> {
         );
       },
     );
-
-    _notesSub = _repository.watchNotes(user.uid).listen(
-      (notes) {
-        state = state.copyWith(notes: notes);
-      },
-      onError: (error) {
-        state = state.copyWith(
-          errorMessage: 'Không thể tải danh sách ghi chú. Chi tiết: $error',
-        );
-      },
-    );
   }
 
-  Future<void> createTask({
+  Future<bool> createTask({
     required String title,
     required DateTime deadline,
     required TaskPriority priority,
   }) async {
     final user = _ref.read(currentUserProvider);
-    if (user == null) return;
+    if (user == null) return false;
 
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
@@ -103,6 +117,7 @@ class NotesRemindersViewModel extends StateNotifier<NotesRemindersState> {
 
       await _repository.addTask(task);
       state = state.copyWith(isLoading: false);
+      return true;
     } catch (e, st) {
       debugPrint('createTask error: $e');
       debugPrintStack(stackTrace: st);
@@ -110,6 +125,7 @@ class NotesRemindersViewModel extends StateNotifier<NotesRemindersState> {
         isLoading: false,
         errorMessage: 'Không thể tạo nhắc lịch/deadline: $e',
       );
+      return false;
     }
   }
 
@@ -159,72 +175,25 @@ class NotesRemindersViewModel extends StateNotifier<NotesRemindersState> {
     }
   }
 
-  Future<void> updateTask({
+  Future<bool> updateTask({
     required TaskModel oldTask,
     required TaskModel newTask,
   }) async {
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
-      await _repository.updateTask(oldTask: oldTask, newTask: newTask);
+      final TaskModel reactivatedTask = newTask.copyWith(isCompleted: false);
+      await _repository.updateTask(
+        oldTask: oldTask,
+        newTask: reactivatedTask,
+      );
       state = state.copyWith(isLoading: false);
+      return true;
     } catch (_) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Không thể cập nhật nhắc lịch/deadline.',
       );
-    }
-  }
-
-  Future<void> createNote({
-    required String subjectId,
-    required String content,
-  }) async {
-    final user = _ref.read(currentUserProvider);
-    if (user == null) return;
-
-    try {
-      state = state.copyWith(isLoading: true, errorMessage: null);
-
-      final now = DateTime.now();
-      final note = NoteModel(
-        id: '',
-        uId: user.uid,
-        subjectId: subjectId.trim(),
-        content: content.trim(),
-        createdAt: now,
-        updatedAt: now,
-      );
-
-      await _repository.addNote(note);
-      state = state.copyWith(isLoading: false);
-    } catch (_) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'Không thể tạo ghi chú môn học. Vui lòng thử lại.',
-      );
-    }
-  }
-
-  Future<void> deleteNote(String noteId) async {
-    try {
-      await _repository.deleteNote(noteId);
-    } catch (_) {
-      state = state.copyWith(errorMessage: 'Không thể xóa ghi chú.');
-    }
-  }
-
-  Future<void> updateNote(NoteModel note) async {
-    try {
-      state = state.copyWith(isLoading: true, errorMessage: null);
-      await _repository.updateNote(
-        note.copyWith(updatedAt: DateTime.now()),
-      );
-      state = state.copyWith(isLoading: false);
-    } catch (_) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'Không thể cập nhật ghi chú.',
-      );
+      return false;
     }
   }
 
@@ -235,13 +204,12 @@ class NotesRemindersViewModel extends StateNotifier<NotesRemindersState> {
   @override
   void dispose() {
     _tasksSub?.cancel();
-    _notesSub?.cancel();
     super.dispose();
   }
 }
 
-final notesRemindersViewModelProvider =
-    StateNotifierProvider<NotesRemindersViewModel, NotesRemindersState>((ref) {
-  final repository = ref.watch(notesRemindersRepositoryProvider);
-  return NotesRemindersViewModel(ref, repository);
+final tasksViewModelProvider =
+    StateNotifierProvider<TasksViewModel, TasksState>((ref) {
+  final repository = ref.watch(tasksRepositoryProvider);
+  return TasksViewModel(ref, repository);
 });

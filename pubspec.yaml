@@ -43,6 +43,7 @@ dependencies:
 
   # ASR (Speech to Text)
   speech_to_text: ^7.3.0
+  file_picker: ^8.1.6
 
   # Notifications & Alarm
   flutter_local_notifications: ^17.2.3

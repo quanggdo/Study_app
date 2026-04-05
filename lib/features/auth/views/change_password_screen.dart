@@ -154,7 +154,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
               const SizedBox(height: 16),
 
-              Divider(color: colorScheme.outline.withOpacity(0.3)),
+              Divider(color: colorScheme.outline.withValues(alpha: 0.3)),
 
               const SizedBox(height: 16),
 
@@ -229,3 +229,4 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     );
   }
 }
+
