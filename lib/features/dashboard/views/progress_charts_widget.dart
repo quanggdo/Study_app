@@ -467,7 +467,7 @@ class _QuizScoresChart extends StatelessWidget {
 
     // Giới hạn số lượng quiz hiển thị để không quá nhiều
     final displayedQuizzes = quizScores.take(5).toList();
-    const maxScore = 100.0;
+    const maxScore = 10.0; // Thang điểm 10
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -486,7 +486,7 @@ class _QuizScoresChart extends StatelessWidget {
                     width: 12,
                     height: 12,
                     decoration: BoxDecoration(
-                      color: colorScheme.primary,
+                      color: Colors.orange,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -504,7 +504,7 @@ class _QuizScoresChart extends StatelessWidget {
                     width: 12,
                     height: 12,
                     decoration: BoxDecoration(
-                      color: colorScheme.secondary,
+                      color: Colors.green,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -533,7 +533,7 @@ class _QuizScoresChart extends StatelessWidget {
                     final score = rod.toY;
                     final label = rodIndex == 0 ? 'Cao nhất' : 'Trung bình';
                     return BarTooltipItem(
-                      '$label: ${score.toStringAsFixed(1)}',
+                      '$label: ${score.toStringAsFixed(1)}/10',
                       TextStyle(
                         color: colorScheme.onSurface,
                         fontWeight: FontWeight.w600,
@@ -612,19 +612,19 @@ class _QuizScoresChart extends StatelessWidget {
                   return BarChartGroupData(
                     x: index,
                     barRods: [
-                      // Điểm cao nhất
+                      // Điểm cao nhất - màu cam, chia cho 10
                       BarChartRodData(
-                        toY: quiz.highestScore,
-                        color: colorScheme.primary,
+                        toY: quiz.highestScore / 10,
+                        color: Colors.orange,
                         width: 12,
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(4),
                         ),
                       ),
-                      // Điểm trung bình
+                      // Điểm trung bình - màu xanh, chia cho 10
                       BarChartRodData(
-                        toY: quiz.averageScore,
-                        color: colorScheme.secondary,
+                        toY: quiz.averageScore / 10,
+                        color: Colors.green,
                         width: 12,
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(4),
